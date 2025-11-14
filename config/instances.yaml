@@ -66,7 +66,7 @@ containers:
 
 virtualmachines:
   - name: "control"
-    image: "base-zero-aap-2.5-container-ce"
+    image: "aap-2.6-2-ceh-20251103"
     memory: "16G"
     cores: 4
     image_size: "30Gi"
@@ -135,6 +135,7 @@ virtualmachines:
           fH5qke1XR5LFGpndX1GuSVBhdZq94x0aGXWTQCDNIPQ3QtrQ64PBF1vRFdJ6o/FI
           uEOWpQhGYHMC0A==
           -----END CERTIFICATE-----
+
   - name: "vscode"
     image: "devtools-ansible"
     memory: "8G"
@@ -148,12 +149,6 @@ virtualmachines:
     networks:
       - default
     services:
-      # - name: vscode-http
-      #   ports:
-      #     - port: 80
-      #       protocol: TCP
-      #       targetPort: 80
-      #       name: vscode
       - name: vscode-8080
         ports:
           - port: 8080
@@ -161,16 +156,80 @@ virtualmachines:
             targetPort: 8080
             name: vscode
     routes:
-      # - name: vscode-http
-      #   host: vscode
-      #   service: vscode-http
-      #   targetPort: 80
-      #   tls: true
-      #   tls_termination: Edge
       - name: vscode-8080
         host: vscode
         service: vscode-8080
         targetPort: 8080
+        tls: true
+        tls_termination: Edge
+    userdata: |-
+      #cloud-config
+      user: rhel
+      password: ansible123!
+      chpasswd: { expire: False }
+      runcmd:
+        - echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/50-cloud-init.conf
+        - systemctl reload sshd
+
+  - name: "rheltfe"
+    image: "rhel-9.6"
+    memory: "8G"
+    cores: 2
+    image_size: "20Gi"
+    disk_type: "scsi"
+    bootloader: "efi"
+    tags:
+      - key: "AnsibleGroup"
+        value: "isolated"
+    networks:
+      - default
+    services:
+      - name: rheltfe-https
+        ports:
+          - port: 443
+            protocol: TCP
+            targetPort: 443
+            name: vscode
+    routes:
+      - name: rheltfe-https
+        host: rheltfe
+        service: rheltfe-https
+        targetPort: 443
+        tls: true
+        tls_termination: Edge
+    userdata: |-
+      #cloud-config
+      user: rhel
+      password: ansible123!
+      chpasswd: { expire: False }
+      runcmd:
+        - echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/50-cloud-init.conf
+        - systemctl reload sshd
+
+  - name: "rhelvault"
+    image: "rhel-9.6"
+    memory: "8G"
+    cores: 2
+    image_size: "20Gi"
+    disk_type: "scsi"
+    bootloader: "efi"
+    tags:
+      - key: "AnsibleGroup"
+        value: "isolated"
+    networks:
+      - default
+    services:
+      - name: rhelvault-https
+        ports:
+          - port: 443
+            protocol: TCP
+            targetPort: 443
+            name: vscode
+    routes:
+      - name: rhelvault-https
+        host: rhelvault
+        service: rhelvault-https
+        targetPort: 443
         tls: true
         tls_termination: Edge
     userdata: |-
