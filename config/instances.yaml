@@ -172,7 +172,7 @@ virtualmachines:
         - systemctl reload sshd
 
   - name: "rheltfe"
-    image: "rhel-9.6"
+    image: "tfe-rhel-image-1"
     memory: "8G"
     cores: 2
     image_size: "20Gi"
