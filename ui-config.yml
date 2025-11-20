@@ -30,6 +30,8 @@ tabs:
   - name: Cloud (AWS)
     url: /cloud
   - name: Vault
-    url: https://vault-${guid}.${domain}
+    url: https://vault-${guid}.${domain}/ui/vault/unseal
+    external: false
   - name: Terraform
     url: https://terraform-${guid}.${domain}
+    external: false
