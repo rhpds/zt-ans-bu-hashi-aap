@@ -201,8 +201,8 @@ virtualmachines:
         host: terraform
         service: tfe-https
         targetPort: 443
-        tls: true
-        tls_termination: edge
+        tls: false
+        #tls_termination: edge
       - name: tfe-9090
         host: terraform-9090
         service: tfe-9090
@@ -247,13 +247,13 @@ virtualmachines:
             name: vault-8200
     routes:
       - name: vault-https
-        host: vault
+        host: vault-https
         service: vault-https
         targetPort: 443
         tls: true
         tls_termination: Edge
       - name: vault-8200
-        host: vault-8200
+        host: vault
         service: vault-8200
         targetPort: 8200
         tls: true
