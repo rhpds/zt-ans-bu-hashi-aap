@@ -245,12 +245,12 @@ virtualmachines:
     networks:
       - default
     services:
-      - name: vault-https
-        ports:
-          - port: 443
-            protocol: TCP
-            targetPort: 443
-            name: vault-https
+ #     - name: vault-https
+ #       ports:
+ #         - port: 443
+ #           protocol: TCP
+ #           targetPort: 443
+ #           name: vault-https
       - name: vault-8200
         ports:
           - port: 8200
@@ -258,12 +258,12 @@ virtualmachines:
             targetPort: 8200
             name: vault-8200
     routes:
-      - name: vault-https
-        host: vault-https
-        service: vault-https
-        targetPort: 443
-        tls: true
-        tls_termination: Edge
+#      - name: vault-https
+#        host: vault-https
+#        service: vault-https
+#        targetPort: 443
+#        tls: true
+#        tls_termination: Edge
       - name: vault-8200
         host: vault
         service: vault-8200
