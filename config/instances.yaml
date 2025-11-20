@@ -190,13 +190,25 @@ virtualmachines:
             protocol: TCP
             targetPort: 443
             name: tfe-https
+      - name: tfe-9090
+        ports:
+          - port: 9090
+            protocol: TCP
+            targetPort: 9090
+            name: terraform
     routes:
       - name: tfe-https
-        host: terraform
+        host: tfe-https
         service: tfe-https
         targetPort: 443
         tls: true
         tls_termination: edge
+      - name: tfe-9090
+        host: terraform
+        service: tfe-9090
+        targetPort: 9090
+        tls: true
+        tls_termination: Edge
         #tls_termination: reencrypt
         #tls_destinationCACertificate: |
     userdata: |-
