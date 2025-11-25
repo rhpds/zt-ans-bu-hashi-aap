@@ -26,4 +26,4 @@ chmod 600 "$CERT_DIR/key.pem"
 chmod 644 "$CERT_DIR/bundle.pem"
 
 systemctl daemon-reload
-#systemctl restart podman
+podman restart terraform-enterprise-terraform-enterprise
