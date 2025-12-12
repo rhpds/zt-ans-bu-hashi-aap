@@ -1,4 +1,4 @@
-* xref:module-01.adoc[1. Terraform and Ansible Automation Platform 2.5]
+* xref:module-01.adoc[1. Terraform Enterprise & Red Hat Ansible Automation Platform]
 ** xref:module-01.adoc#task1[☑️ Task 1 - Configure the Terraform Backend Credential in Ansible Automation Platform]
 ** xref:module-01.adoc#task2[☑️ Task 2 - Terraform Inventory]
 ** xref:module-01.adoc#task3[☑️ Task 3 - Create a Job Template to kick off a Terraform project (Terraform provider for AWS]

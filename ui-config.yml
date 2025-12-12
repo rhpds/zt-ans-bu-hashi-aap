@@ -5,7 +5,7 @@ antora:
   dir: www
   modules:
     - name: module-01
-      label: "Terraform and Ansible Automation Platform 2.5"
+      label: "Terraform Enterprise & Red Hat Ansible Automation Platform"
       solveButton: false
     - name: module-02
       label: "Create a Terraform-enabled Execution Environment"
