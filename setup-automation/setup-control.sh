@@ -179,23 +179,13 @@ tee /tmp/setup.yml << EOF
           username: "{{ aws_access_key }}"
           password: "{{ aws_secret_key }}"
 
-    # - name: Remove Demo Inventory
-    #   ansible.controller.inventory:
-    #     controller_host: "https://localhost"
-    #     controller_username: admin
-    #     controller_password: ansible123!
-    #     validate_certs: false
-    #     name: "Demo Inventory"
-    #     organization: Default
-    #     state: absent
-
     # - name: Ensure inventory exists
     #   ansible.controller.inventory:
     #     controller_host: "https://localhost"
     #     controller_username: admin
     #     controller_password: ansible123!
     #     validate_certs: false
-    #     name: "AWS Inventory example"
+    #     name: "AWS Inventory"
     #     organization: Default
     #     state: present
     #   register: aws_inventory_result
@@ -207,7 +197,7 @@ tee /tmp/setup.yml << EOF
     #     controller_password: ansible123!
     #     validate_certs: false
     #     name: "AWS EC2 Instances Source"
-    #     inventory: "AWS Inventory example"
+    #     inventory: "AWS Inventory"
     #     source: ec2
     #     credential: "AWS Credential"
     #     source_vars:
@@ -251,11 +241,12 @@ tee /tmp/setup.yml << EOF
     - name: Add project
       ansible.controller.project:
         name: "Terraform Demos Project"
-        description: "This is from github.com/ansible-cloud"
+        description: "This is from github.com/ansible-tmm"
         organization: "Default"
         state: present
         scm_type: git
-        scm_url: http://gitea:3000/student/terraform-aap.git
+#        scm_url: http://gitea:3000/student/terraform-aap.git
+        scm_url: https://github.com/ansible-tmm/aap-hashi-lab.git
         default_environment: "Terraform Execution Environment"
         controller_username: admin
         controller_password: ansible123!
