@@ -36,7 +36,7 @@
     satellite_activationkey: "{{ lookup('ansible.builtin.env', 'SATELLITE_ACTIVATIONKEY') }}"
     aws_access_key: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID') | default('AWS_ACCESS_KEY_ID_NOT_FOUND', true) }}"
     aws_secret_key: "{{ lookup('ansible.builtin.env', 'AWS_SECRET_ACCESS_KEY') | default('AWS_SECRET_ACCESS_KEY_NOT_FOUND', true) }}"
-    aws_default_region: "{{ lookup('ansible.builtinenv', 'AWS_DEFAULT_REGION') | default('AWS_DEFAULT_REGION_NOT_FOUND', true) }}"
+    aws_default_region: "{{ lookup('ansible.builtin.env', 'AWS_DEFAULT_REGION') | default('AWS_DEFAULT_REGION_NOT_FOUND', true) }}"
     guid: "{{ lookup('ansible.builtin.env', 'GUID') }}"
     domain: "{{ lookup('ansible.builtin.env', 'DOMAIN') }}"
   tasks:
