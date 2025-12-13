@@ -2,7 +2,7 @@
 
 '''
 
-= *Terraform & Red Hat Ansible Automation Platform 2.5*
+= *Terraform Enterprise & Red Hat Ansible Automation Platform*
 image:https://github.com/HichamMourad/terraform-aap/blob/main/images/main.png?raw=true[]
 
 Welcome!!! 
