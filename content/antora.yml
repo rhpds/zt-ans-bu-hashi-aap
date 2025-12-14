@@ -1,5 +1,5 @@
 name: modules
-title: Exercises
+title: Terraform Enterprise & Red Hat Ansible Automation Platform
 version: master
 nav:
   - modules/ROOT/nav.adoc
