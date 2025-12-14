@@ -41,7 +41,7 @@ containers:
       - >
         curl -X POST -H "accept: application/json" -H "Content-Type:
         application/json" -u 'gitea:gitea'  -d '{"username": "student",
-        "full_name": "student", "description": "student"}'
+        "full_name": "student", "description": "student", "password": "ansible123!"}'
         http://localhost:3000/api/v1/orgs
       - >
         curl -X POST -H "accept: application/json" -H "Content-Type:
