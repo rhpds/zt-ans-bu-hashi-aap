@@ -20,8 +20,8 @@ antora:
 tabs:
   - name: Ansible Automation Platform
     url: https://control-${guid}.${domain}/
-  # - name: gitea
-  #   url: https://gitea-${guid}.${domain}/
+  - name: gitea
+    url: https://gitea-${guid}.${domain}/
   - name: VS Code
     url: https://vscode-${guid}.${domain}
     external: false
