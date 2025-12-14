@@ -3,8 +3,8 @@
   hosts: localhost
   gather_facts: false
 
-  # vars_files:
-  #   - ../config/secrets.yaml
+  vars_files:
+    - ../config/secrets.yaml
 
   tasks:
   - name: Add bastion host
@@ -83,6 +83,10 @@
       AWS_DEFAULT_REGION: "{{ aws_default_region }}"
       GUID: "{{ guid }}"
       DOMAIN: "{{ domain }}"
+      QUAY_USERNAME: "{{ username }}"
+      QUAY_PASSWORD: "{{ password }}"
+      REG_KEY: "{{ reg_username }}"
+      REG_PASS: "{{ reg_password }}"
 
   - name: Output script result
     ansible.builtin.debug:
