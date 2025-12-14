@@ -1,7 +1,5 @@
 :doctype: book
 
-'''
-
 = *Terraform Enterprise & Red Hat Ansible Automation Platform*
 image::main.png[]
 
@@ -21,8 +19,6 @@ Centrally from Ansible Automation Platform you will trigger an Ansible Workflow 
 
 * In this first challenge you will learn
 ** How to create an Ansible Workflow template and run it to create resources in AWS using Terraform
-
-'''
 
 ==  Configure th.......
 
@@ -78,9 +74,8 @@ WARNING: *Before you click on `Create credential` to save the `Backend configura
 mm
 ----
 
-'''
 
-== ☑️ Task 2 - Terraform Inventory
+== Terraform Inventory
 
 === In `Ansible Automation Platform`, create the Terraform inventory source
 
@@ -131,8 +126,6 @@ Click the `+ Create Source` and then enter the following details.
 | Source variables
 | backend_type: s3
 |===
-
-'''
 
 == Create a Workflow Template to kick off a Terraform project (Terraform provider for AWS)
 

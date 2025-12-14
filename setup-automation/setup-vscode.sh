@@ -36,7 +36,7 @@ mkdir -p /home/rhel/lab_exercises/1.Terraform_Basics
 mkdir -p /home/rhel/lab_exercises/2.Terraform_Ansible
 mkdir -p /home/rhel/lab_exercises/3.Terraform_Provider
 mkdir -p /home/rhel/lab_exercises/4.Terraform_AAP_Provider
-mkdir -p /home/rhel/terraform-ee
+mkdir -p /home/rhel/hashicorp-ee
 mkdir /tmp/terraform_lab/
 mkdir /tmp/terraform-ansible
 mkdir /tmp/terraform-aap-provider
@@ -173,8 +173,8 @@ python3 --version
 pip3 install --upgrade ansible-builder
 #
 #
-touch /home/rhel/terraform-ee/execution-environment.yml
-touch /home/rhel/terraform-ee/requirements.yml
+touch /home/rhel/hashicorp-ee/execution-environment.yml
+touch /home/rhel/hashicorp-ee/requirements.yml
 chown -R rhel:rhel /home/rhel/
 chmod -R 777 /home/rhel/
 #
