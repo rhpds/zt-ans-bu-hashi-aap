@@ -31,7 +31,7 @@ tabs:
     url: /cloud
   - name: Vault
     url: https://vault-${guid}.${domain}/ui/vault/unseal
-    external: false
+    external: true
   - name: Terraform
     url: https://tfe-https-${guid}.${domain}/session
-    external: false
+    external: true
