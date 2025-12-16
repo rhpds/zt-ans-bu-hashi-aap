@@ -1,8 +1,8 @@
 :doctype: book
 
-= Create a HashiCorp-enabled Execution Environment
+= How to create a HashiCorp-enabled Execution Environment
 
-In this challenge you will create an Execution Environment that will enable Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise usage in Ansible Automation Platform.  It will include all the dependencies needed.
+In this challenge we will discuss how to create an Execution Environment that will enable Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise usage in Ansible Automation Platform. It will include all the dependencies needed.
 
 == What is an Execution Environment?
 All automation in Red Hat Ansible Automation Platform runs on container images called automation execution environments.
@@ -10,14 +10,17 @@ Automation execution environments create a common language for communicating aut
 
 In the previous challenge an Execution Environment called `Terraform Execution Environment` was already created for you. It included the new **hashicorp.terraform**, and **hashicorp.vault** collections, the Terraform binary, other cloud collections, and other dependencies.
 
+**We feel it's important to understand how to create an Execution Environment, for this specific scenario.**
+NOTE: *You can skip this challenge if you are not interested in learning how to create an Execution Environment.*
+
 *To use HashiCorp Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise in YOUR Ansible Automation Platform environment you must create and Execution Environment* that includes the Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise collections, the Terraform binary, other cloud collections, and other dependencies.
-*Hence, why you will learn how to create an Execution Environment, for this specific scenario.*
+
 
 The tool needed to create an `execution environment` is called `ansible-builder`
 
-== Challenge introduction.
+== Introduction.
 
-Estimated time to complete: _30 minutes_
+Estimated time to complete: _5 minutes_
 
 In this challenge you will learn:
 
@@ -29,33 +32,19 @@ In this challenge you will learn:
 
 == Execution Environments
 
-To trigger Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise commands from within Ansible Automation Platform, you will need to create an execution environment container imagethat contains the Terraform binary and the Red Hat certified collection for HashiCorp Terraform and HashiCorp Vault.
+To trigger Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise commands from within Ansible Automation Platform, you will need to create an execution environment container image that contains the Terraform binary and the Red Hat certified collection for HashiCorp Terraform and HashiCorp Vault.
 
 This is easy to do using https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/latest/html/creating_and_using_execution_environments/assembly-using-builder[ansible-builder].
 
-NOTE: You can perform the following steps at the TERMINAL, or in Visual Studio Code (VSCode).
-In VSCode you can also open a terminal prompt.
-Choose either the `TERMINAL` tab, or the `VSCODE` tab from the top of the lab screen.
 
 
-== Create the configuration files for the execution environment
+
+== How to create the configuration files for the execution environment
 
 To create an execution environment with `ansible-builder`, we need an execution environment definition file.
 The file name will be `execution-environment.yml`
 
-Go to the `TERMINAL`  tab at the top of the lab to open the terminal prompt.
-You will be in the `/home/rhel` folder
-
-Change to the folder named `/home/rhel/hashicorp-ee`
-
-[source,bash,role=execute]
-----
-cd /home/rhel/hashicorp-ee
-----
-
-Two empty files named `execution-environment.yml` and `requirements.yml` already exist in this folder.
-
-Modify the `execution-environment.yml` file and paste into it the following contents:
+Below is what the `execution-environment.yml` file will look like:
 
 [source,yaml,role=execute]
 ----
@@ -94,7 +83,8 @@ In this example, we are also downloading and installing the HashiCorp Terraform 
 `prepend_base` is to include commands to be used `before` the main build steps.
 `append_base` is to include commands to be used `after` the main build steps.
 
-Modify the file called `requirements.yml` and paste the following contents: 
+
+Below is what the `requirements.yml` file will look like:
 
 [source,yaml,role=execute]
 ----
@@ -110,19 +100,16 @@ collections:
 
 This file defines the Ansible content collections you want to include in your execution environment.
 
-. Include the cloud collections `amazon.aws`, `cloud.terraform`, `google.cloud`, and `azure.azcollection` collections.
-. Most importantly, we are including the `hashicorp.terraform` and `hashicorp.vault` collections.
-. This will allow Ansible playbooks to perform automation on cloud infrastructure on AWS, Azure and GCP using HashiCorp Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise and Ansible Automation Platform.
+. Include the cloud collections `amazon.aws`, `cloud.terraform`, `google.cloud`, and `azure.azcollection` collections. I include these to allow Terraform Enterprise (and HCP Terraform) to spin up  cloud infrastructure on AWS, Azure and GCP.
+. Most importantly, we are including the `hashicorp.terraform` and `hashicorp.vault` collections. These will allow you from Ansible Automation Platform to trigger Terraform Enterprise (and HCP Terraform) and HashiCorp Vault Enterprise operations.
 . If additional collections are desired, you would include them in the `requirements.yml` file as well
 
-Please move ahead to the next task.
 
-
-== Run ansible-builder
+== How to run `ansible-builder` to build the execution environment container
 
 Run `ansible-builder` to build the execution environment container.
 
-From the terminal prompt run the following:
+Below is the command to run `ansible-builder` to build the execution environment container.
 
 [source,bash,role=execute]
 ----
@@ -130,12 +117,11 @@ ansible-builder build -v 3 --tag hashicorp-ee
 ----
 
 This will build the container image tagged with `hashicorp-ee`.
-This will take a few minutes, and you should see output similar to the following:
+This will take a few minutes.
 
 image::ansible-builder-success.png[]
 
-To see the newly created image run the following command.
-This image was built locally.
+To see the newly created image on a RHEL system, you can also use the `podman` command.
 
 [source,bash,role=execute]
 ----
@@ -143,7 +129,7 @@ podman images
 ----
 
 At this point, you would typically push the container image to a registry such as `Quay` or `Dockerhub` or your own `Private Automation Hub`.
-If you have a Quay or Dockerhub account already, feel free to create a repository, push the image as you normally would, and use it in the following steps, *_otherwise we have a pre-existing image you can pull._*
+If you have a Quay or Dockerhub account already, feel free to create a repository, push the image as you normally would, and use it in the following steps, 
 
 *_Example commands_* on how to tag and then push the Execution Environment image to Quay.io
 
@@ -156,19 +142,9 @@ podman login --username [username] --password [mypassowrd] quay.io
 podman push quay.io/[username]/hashicorp-ee
 ----
 
-'''
+== How to add the Terraform Execution Environment to Ansible Automation Platform
 
-== Add the Terraform Execution Environment to Ansible Automation Platform
-
-Now you will add an execution environment to Ansible Automation Platform.
-
-Click on the `Ansible Automation Platform` tab at the top of lab.
-(if not already)
-
-Log in using the following *Login Credentials:*
-
-* `User:  admin` 
-* `Password:  ansible123!`
+To add an execution environment to Ansible Automation Platform, you can follow the steps below.
 
 Expand the `Automation Execution` menu on the left.
 
@@ -180,23 +156,18 @@ Click on `+ Create execution environment` and enter the following information.
 | Field | Value
 
 | Name
-| myHashiCorp EE
+| myHashiCorp EE (or whatever you want to call it)
 
 | Image
-| quay.io/acme_corp/terraform_ee
+| quay.io/acme_corp/terraform_ee (or whatever you may havecall it)
 
 | Pull
 | Only pull the image if not present before running
 
 | Registry credential
-| Quay Registry Credential
+| Quay Registry Credential (if you are using a private registry)
 |===
 
-NOTE: *Since this image on Quay.io is public you don't need to create a Registry credential*
+Click on `Create execution environment`.
 
-Click on `Create execution environment` to save this new Execution Environmnet.
-Yes, Yes, we're using the same image we already have, but remember, this is just to demnstrate how you would add your own created Execution Environment to Ansible Automation Platform.
-
-image::create-ee.png?raw=true[]
-
-This Execution Environment is now available for use in Ansible Automation Platform.
+This Execution Environment would now be available for use in Ansible Automation Platform.
