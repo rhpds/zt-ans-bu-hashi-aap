@@ -16,13 +16,9 @@
 ** xref:module-02.adoc#task6[How to add the Terraform Execution Environment to Ansible Automation Platform]
 
 * xref:module-03.adoc[Trigger Infrastructure Provisioning and automation from Terraform Enterprise]
-** xref:module-03.adoc#task1[Initialize a Terraform Project]
-** xref:module-03.adoc#task2[Plan and Apply the Terraform Project]
-** xref:module-03.adoc#task3[Make Changes to the Terraform Project]
-** xref:module-03.adoc#task4[Deprovisioning resources of a Terraform Project]
+** xref:module-03.adoc#task1[How to trigger infrastructure provisioning and automation from Terraform Enterprise]
 
 * xref:module-04.adoc[Bring in HashiCorp Vault Enterprise to your automation pipeline]
-** xref:module-04.adoc#task1[Install the Red Hat certified collection for Terraform (cloud.terraform)]
-** xref:module-04.adoc#task2[Terraform Provider for Ansible *(OPTIONAL)*]
-** xref:module-04.adoc#task3[The Terraform Provider for Ansible Automation Platform]
-
+** xref:module-04.adoc#task1[What is HashiCorp Vault Enterprise]
+** xref:module-04.adoc#task2[How to bring in HashiCorp Vault Enterprise to your automation pipeline]
+** xref:module-04.adoc#task3[How to use HashiCorp Vault Enterprise in your automation pipeline]

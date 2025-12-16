@@ -4,11 +4,13 @@
 
 In this challenge you will learn how to bring in HashiCorp Vault Enterprise to your automation pipeline.
 
+[#task1]
 == What is HashiCorp Vault Enterprise?
 
 HashiCorp Vault Enterprise is a tool that allows you to manage secrets and other sensitive data.
 
+[#task2]
 == How to bring in HashiCorp Vault Enterprise to your automation pipeline
 
-
+[#task3]
 == How to use HashiCorp Vault Enterprise in your automation pipeline
