@@ -5,7 +5,7 @@
 ** xref:module-01.adoc#task4[Create the Terraform Enterprise Credential in Ansible Automation Platform]
 ** xref:module-01.adoc#task5[Terraform Inventory]
 ** xref:module-01.adoc#task6[Create a Workflow Template to kick off a Terraform Enterprise PLAN and APPLY operation]
-** xref:module-01.adoc#task7[Create the Terraform Enterprise DESTROY Workflow workflow template, and it’s nodes]
+** xref:module-01.adoc#task7[Create the Terraform Enterprise DESTROY Workflow workflow template, and its nodes]
 
 * xref:module-02.adoc[How to create a HashiCorp-enabled Execution Environment]
 ** xref:module-02.adoc#task1[What is an Execution Environment?]

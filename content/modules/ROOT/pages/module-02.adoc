@@ -4,6 +4,7 @@
 
 In this challenge we will discuss how to create an Execution Environment that will enable Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise usage in Ansible Automation Platform. It will include all the dependencies needed.
 
+[#task1]
 == What is an Execution Environment?
 All automation in Red Hat Ansible Automation Platform runs on container images called automation execution environments.
 Automation execution environments create a common language for communicating automation dependencies, and offer a standard way to build and distribute the automation environment.
@@ -18,6 +19,7 @@ NOTE: *You can skip this challenge if you are not interested in learning how to 
 
 The tool needed to create an `execution environment` is called `ansible-builder`
 
+[#task2]
 == Introduction.
 
 Estimated time to complete: _5 minutes_
@@ -30,15 +32,14 @@ In this challenge you will learn:
 
 * How to add the new execution environment to Ansible Automation Platform
 
+[#task3]
 == Execution Environments
 
 To trigger Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise commands from within Ansible Automation Platform, you will need to create an execution environment container image that contains the Terraform binary and the Red Hat certified collection for HashiCorp Terraform and HashiCorp Vault.
 
 This is easy to do using https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/latest/html/creating_and_using_execution_environments/assembly-using-builder[ansible-builder].
 
-
-
-
+[#task4]
 == How to create the configuration files for the execution environment
 
 To create an execution environment with `ansible-builder`, we need an execution environment definition file.
@@ -105,6 +106,7 @@ This file defines the Ansible content collections you want to include in your ex
 . If additional collections are desired, you would include them in the `requirements.yml` file as well
 
 
+[#task5]
 == How to run `ansible-builder` to build the execution environment container
 
 Run `ansible-builder` to build the execution environment container.
@@ -142,6 +144,7 @@ podman login --username [username] --password [mypassowrd] quay.io
 podman push quay.io/[username]/hashicorp-ee
 ----
 
+[#task6]
 == How to add the Terraform Execution Environment to Ansible Automation Platform
 
 To add an execution environment to Ansible Automation Platform, you can follow the steps below.

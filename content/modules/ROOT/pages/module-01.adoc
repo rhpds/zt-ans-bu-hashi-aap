@@ -22,7 +22,7 @@ Centrally from Ansible Automation Platform you will trigger an Ansible Workflow 
 
 There are `several prerequisites` that you will need to complete before you can start this lab. These are:
 
-
+[#task1]
 ==  Create a Terraform Enterprise credential type.
 An Ansible Credential Type defines a structure (schema) for storing and using secrets like passwords, SSH keys, or API tokens, allowing secure management within Ansible Automation Platform for connecting to systems in this example Terraform Enterprise.
 
@@ -31,25 +31,28 @@ This task is done in Ansible Automation Platform.
 image::tfecredtype.png[]
 
 
+[#task2]
 == Create the Terraform Enterprise API token
 
 This task is done in Terraform Enterprise.
 
 image::tfetoken.png[]
 
+[#task3]
 == Create an Terraform Enterprise Workspace
 
 This task is done in Terraform Enterprise.
 
 image::tfeworkspace1.png[]
 
+[#task4]
 == Create the Terraform Enterprise Credential in Ansible Automation Platform
 
 This task is done in Ansible Automation Platform.
 
 image::tfecred.png[]
 
-=== Log in to the `Ansible Automation Platform` and create the Workflow template
+== Log in to the `Ansible Automation Platform` and create the Workflow template
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 
@@ -84,6 +87,7 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 . Click on `Create credential` to save the credential
 
 
+[#task5]
 == Terraform Inventory
 
 An Inventory is a collection of hosts against which automation jobs may be launched.
@@ -145,6 +149,7 @@ Scroll to the bottom Click the blue `Create source` button to **save** the Inven
 
 image::tfinventorysource.png[]
 
+[#task6]
 == Create a Workflow Template to kick off a Terraform Enterprise `**PLAN and APPLY**` operation
 
 In this Task we will create an Ansible Job Template that will kick off a Terrafrom project.
@@ -152,7 +157,7 @@ The Terraform project is a simple project that will leverage the AWS provider to
 
 NOTE: *Please note that you can also do this in Azure and Google Cloud in the same way as you are here with AWS*
 
-=== Create the first job template
+=== Create the `Terraform Enterprise APPLY` job template
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already) Expand the `Automation Execution` menu on the left.
@@ -218,7 +223,13 @@ Return to the `Hosts` menu, and notice that you have an EC2 instance that was cr
 * Observe the resource count in the Terraform Enterprise console. You will see the resources created by Terraform.
 
 
-=== Create and Launch a Workflow template to `**DESTROY**` the created resources
+[#task7]
+== Create the `Terraform Enterprise DESTROY Workflow` workflow template, and its nodes
+
+In this task we will create a Workflow template to trigger a `Terraform Enterprise DESTROY` operation to destroy the previously created resources.
+
+=== Create the `Terraform Enterprise DESTROY` job template
+
 Start by creating the another job template to trigger a `Terraform Entperprise destroy operation` to destroy the created resources.
 Click on the `Ansible Automation Platform` tab at the top of lab. (if not already)
 Expand the `Automation Execution` menu on the left.
@@ -250,10 +261,7 @@ Fill out the following fields:
 |===
 
 
-
-== Create the `Terraform Enterprise DESTROY Workflow` workflow template, and it's nodes
-
-
+=== Launch the `Terraform Enterprise DESTROY Workflow` template
 
 Launch the `Terraform Enterprise DESTROY Workflow` template by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon. The job status will show `Running` momentarily.
 
