@@ -290,7 +290,7 @@ NOTE: *Please note that you can also do this in Azure and Google Cloud in the sa
 Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already) Expand the `Automation Execution` menu on the left.
 `Automation Execution` -> `Templates`.
-Now click on `+ Create Template`
+Now click on `+ Create job template`
 
 Fill out the following fields:
 |===
@@ -315,26 +315,38 @@ Fill out the following fields:
 | Terraform Enterprise credential
 |===
 
-ADD the following to the `extra variables` section
-
-[source,yaml,role=execute]
-----
----
-aws_region: us-east-1
-aws_name_tag: tfevm
-aws_instance_size: t2.medium
-aws_instance_count: 1
-aws_instance_public_key: << Your id_rsa.pub >>
-----
-
-Scroll to the bottom Click the blue `Create Job Template` button to **save** the job template.
+Scroll to the bottom Click the blue `Create  Job Template` button to **save** the job template.
 
 image::templateapply1.png[]
 
 === Create the `Terraform Enterprise APPLY Workflow` workflow template, and it's nodes
 
+Click on the `Ansible Automation Platform` tab at the top of lab.
+(if not already) Expand the `Automation Execution` menu on the left.
+`Automation Execution` -> `Templates`.
+Now click on `+ Create Workflow job template`
+
+Fill out the following fields:
+|===
+| Field | Value
+
+| Name
+| WF-Terraform Enterprise APPLY
+|===
+
+Scroll to the bottom Click the blue `Create Workflow Job Template` button to **save** the Workflow.
+
+image::wftemplateapply1.png[]
+
+=== Create the nodes for the `WF-Terraform Enterprise APPLY` workflow template
+
+* Select `+ Add step` and then select the `Terraform Enterprise APPLY` job template you created earlier, Select `Next` to continue, and then `Finish` to save the node.
+* Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
+* For this next step change the `Node Type` to `Inventory Source Sync` and select the `AWS source for TFE Inventory`. Select `Next` then `Finish` to save this second step. This will synchronize the inventory source you created earlier.
+* Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
 
 
+image::wftemplateapply2.png[]
 
 Launch the `Terraform Enterprise APPLY Workflow` template by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon, depending on where you are in the templates view.  The job status will show `Running` momentarily.
 
