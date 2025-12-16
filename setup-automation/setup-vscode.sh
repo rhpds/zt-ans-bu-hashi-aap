@@ -1,5 +1,10 @@
 #!/bin/bash
 
+rm -f /etc/yum.repos.d/*.repo
+sudo dnf clean all
+sudo subscription-manager remove --all
+sudo subscription-manager clean
+
 retry() {
     for i in {1..3}; do
         echo "Attempt $i: $2"
