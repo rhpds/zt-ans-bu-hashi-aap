@@ -18,22 +18,34 @@ In the following challenge tasks you will use Ansible Automation Platform and Te
 Centrally from Ansible Automation Platform you will trigger an Ansible Workflow that will use Terraform to create cloud Infrastructure, and then synchronize the inventory back into Ansible Automation Platform, and go on to perform other configuration and orchestration tasks.
 
 * In this first challenge you will learn
-** How to create an Ansible Workflow template and run it to create resources in AWS using Terraform
+** How to create an Ansible Workflow template and run it to create resources in AWS using Terraform Enterprise and Ansible Automation Platform will perform further configuration and orchestration tasks.
+
+There are `several prerequisites` that you will need to complete before you can start this lab. These are:
+
 
 ==  Create a Terraform Enterprise credential type.
+An Ansible Credential Type defines a structure (schema) for storing and using secrets like passwords, SSH keys, or API tokens, allowing secure management within Ansible Automation Platform for connecting to systems in this example Terraform Enterprise.
+
+This task is done in Ansible Automation Platform.
 
 image::tfecredtype.png[]
 
 
 == Create the Terraform Enterprise API token
 
+This task is done in Terraform Enterprise.
+
 image::tfetoken.png[]
 
 == Create an Terraform Enterprise Workspace
 
+This task is done in Terraform Enterprise.
+
 image::tfeworkspace1.png[]
 
 == Create the Terraform Enterprise Credential in Ansible Automation Platform
+
+This task is done in Ansible Automation Platform.
 
 image::tfecred.png[]
 
@@ -74,13 +86,11 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 
 == Terraform Inventory
 
-=== In `Ansible Automation Platform`, create the Terraform inventory source
-
 An Inventory is a collection of hosts against which automation jobs may be launched.
 Inventories.
 You can source your inventory data from external sources and cloud providers.
-In this case we will be sourceing our data from Terraform.
-Hence, why will create a Terraform Inventory Source for this purpose.
+
+=== In `Ansible Automation Platform`, create the Terraform inventory source
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already)
@@ -140,9 +150,9 @@ image::tfinventorysource.png[]
 In this Task we will create an Ansible Job Template that will kick off a Terrafrom project.
 The Terraform project is a simple project that will leverage the AWS provider to create an EC2 instance in the AWS cloud account you are using.
 
-NOTE: *Please note that you can also do this in Azure and Google Cloud in the same way as you are doing here with AWS*
+NOTE: *Please note that you can also do this in Azure and Google Cloud in the same way as you are here with AWS*
 
-=== Create and Launch the job template
+=== Create the first job template
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already) Expand the `Automation Execution` menu on the left.
@@ -188,9 +198,15 @@ Scroll to the bottom Click the blue `Create Job Template` button to **save** the
 
 image::templateapply1.png[]
 
-Launch the `Terraform Enterprise APPLY` job template by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon, depending on where you are in the teplates view.  The job status will show `Running` momentarily.
+=== Create the `Terraform Enterprise APPLY Workflow` workflow template, and it's nodes
 
-`Observe the output of the Job Template run.`
+
+
+
+Launch the `Terraform Enterprise APPLY Workflow` template by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon, depending on where you are in the templates view.  The job status will show `Running` momentarily.
+
+* Observe the output of the Workflow Template run. You will see the nodes running and the workflow visualizer showing the flow of the workflow.
+
 
 === Inspect the Terraform Inventory in Ansible Automation Platform
 Select the `Terraform Inventory`, and then click on the `Hosts` menu.  Notice that there is NO Terraform inventory available yet.
@@ -199,8 +215,11 @@ Now click on the `Sources` menu and click on  `🚀 Launch Inventory Update` ico
 
 Return to the `Hosts` menu, and notice that you have an EC2 instance that was create by Terraform now part of your inventory.
 
+* Observe the resource count in the Terraform Enterprise console. You will see the resources created by Terraform.
 
-=== Create and Launch a job template to `**DESTROY**` the created resources
+
+=== Create and Launch a Workflow template to `**DESTROY**` the created resources
+Start by creating the another job template to trigger a `Terraform Entperprise destroy operation` to destroy the created resources.
 Click on the `Ansible Automation Platform` tab at the top of lab. (if not already)
 Expand the `Automation Execution` menu on the left.
 `Automation Execution` -> `Templates`.
@@ -232,20 +251,21 @@ Fill out the following fields:
 
 
 
+=== Create the `Terraform Enterprise DESTROY Workflow` workflow template, and it's nodes
 
 
 
+Launch the `Terraform Enterprise DESTROY Workflow` template by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon. The job status will show `Running` momentarily.
 
+* Observe the output of the Workflow Template run. You will see the nodes running and the workflow visualizer showing the flow of the workflow.
 
-Launch the `Deploy AWS resources using Terraform AWS & ANSIBLE-AAP provider` job template, by selecting it and clicking on `🚀 Launch template`, or by simply clicking the `Rocket Launcher` 🚀 icon, depending on where you are in the view.  The job status will show `Running` momentarily.
-`Observe the output of the Job Template run.`
+* Observice the resources that were destroyed by Terraform in Ansible Automation Platform -> Inventory -> Terraform Inventory -> Hosts.
 
-=== View the Terraform Inventory
-Return to the `Inventories` menu in Ansible Automation Platform.
-Select the `Terraform Inventory`, and then click on the `Hosts` menu.
-Notice that you have an additional EC2 instance that was create by Terraform now also part of your inventory.
+* Observe the resource count in the Terraform Enterprise console. You will see the resource count should be 0.
 
 
 
 === SUMMARY
-*In this task you created an AAP Job Template, that kicks off a Terraform Project.  The Terraform Project is using the Terrform Provider for ANSIBLE AUTOMATION PLATORM to trigger the creation of the AWS resource(s).  Terraform (via the Terraform Provider for AAP) then automatically pushed the created resources into the Ansibe Automation Platform Inventory.  The Terraform Provider for AAP is something that Terraform users would most likely use at the Terraform command line.  Here you saw how you can still use this in Ansible Automation Platform.  The Terraform Provider for Ansible Automation Platform can also be used in Terraform projects to trigger Ansible Automation Platform Job Templates.  Further enhancing the **BETTER TOGETHER STORY!**, and additionally providing more options and choice for Automators and Infrastructure operators!*
+*In this lab section you created an configured AAP and Terraform Enterprise to work together. You created Workflow templates in Ansible Automation Platform that kick off Terraform Enterprise to provision cloud resources, and then Ansible Automation Platform can perform further automation operations.
+
+This work further enhances the **BETTER TOGETHER STORY!**, and additionally providing more options and choice for Automators and Infrastructure operators!*

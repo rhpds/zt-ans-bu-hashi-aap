@@ -8,13 +8,13 @@ antora:
       label: "Terraform Enterprise & Red Hat Ansible Automation Platform"
       solveButton: false
     - name: module-02
-      label: "Create a Terraform-enabled Execution Environment"
+      label: "How to create a HashiCorp-enabled Execution Environment"
       solveButton: false
     - name: module-03
-      label: "OPTIONAL - Terraform Basics"
+      label: "Trigger Infrastructure Provisioning and automation from Terraform Enterprise"
       solveButton: false
     - name: module-04
-      label: "OPTIONAL - Terraform and the Certified Collection for Terraform"
+      label: "Bring in HashiCorp Vault Enterprise to your automation pipeline"
       solveButton: false
 
 tabs:
