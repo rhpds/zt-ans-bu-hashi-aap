@@ -21,6 +21,7 @@ Centrally from Ansible Automation Platform you will trigger an Ansible Workflow 
 ** How to create an Ansible Workflow template and run it to create resources in AWS using Terraform Enterprise and Ansible Automation Platform will perform further configuration and orchestration tasks.
 
 There are `several prerequisites` that you will need to complete before you can start this lab. These are:
+
 * Terraform Enterprise prerequisites
 * Ansible Automation Platform prerequisites
 
@@ -30,6 +31,7 @@ There are `several prerequisites` that you will need to complete before you can 
 This task is done in Terraform Enterprise. You will need to create an API token in Terraform Enterprise to use in Ansible Automation Platform to authenticate against Terraform Enterprise.
 
 Login to Terraform Enterprise using the following *Login Credentials:*  
+
 * `User:  admin`
 * `Password:  ansible123!`
 
@@ -38,6 +40,7 @@ Login to Terraform Enterprise using the following *Login Credentials:*
 
 
 To create the API token, you will need to navigate to the `Settings` menu in Terraform Enterprise.
+
 * Click on `API Tokens` and then click on `Create Token`.
 * select the `User Tokens` menu option, and then click on `account settings page` link.
 * Click on the `Create an API token` buttom.
@@ -89,6 +92,7 @@ Click on the `Variables` tab.
 
 Click on the `+ Add variable` button.
 Enter the following details:
+
 * Select the `Environment variable` variable type.
 * In the `Key` field enter `AWS_ACCESS_KEY_ID`.
 * In the `Value` field enter the AWS Access Key ID. Get this from the `Cloud(AWS)` tab in your lab.
@@ -101,6 +105,7 @@ Repeat the process for the `AWS_SECRET_ACCESS_KEY` variable.
 
 Click on the `+ Add variable` button.
 Enter the following details:
+
 * Select the `Environment variable` variable type.
 * In the `Key` field enter `AWS_SECRET_ACCESS_KEY`.
 * In the `Value` field enter the AWS Secret Access Key. Get this from the `Cloud(AWS)` tab in your lab.
