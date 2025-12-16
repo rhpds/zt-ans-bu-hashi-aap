@@ -115,12 +115,11 @@ tee /tmp/setup.yml << EOF
     - name: Add project
       ansible.controller.project:
         name: "Terraform Demos Project"
-        description: "This is from the local gitea instance"
+        description: "This is from the GitHub repository for this labs content"
         organization: "Default"
         state: present
         scm_type: git
-        scm_url: http://gitea:3000/laborg/aap-hashi-lab.git
-#        scm_url: https://github.com/ansible-tmm/aap-hashi-lab.git
+        scm_url: https://github.com/ansible-tmm/aap-hashi-lab.git
         default_environment: "Terraform Execution Environment"
         controller_username: admin
         controller_password: ansible123!
