@@ -87,6 +87,7 @@
       QUAY_PASSWORD: "{{ password }}"
       REG_KEY: "{{ reg_username }}"
       REG_PASS: "{{ reg_password }}"
+      SSH_KEY: "{{ ssh_key }}"
 
   - name: Output script result
     ansible.builtin.debug:
