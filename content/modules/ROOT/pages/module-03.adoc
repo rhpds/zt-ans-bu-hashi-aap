@@ -194,7 +194,7 @@ vault login -address=http://127.0.0.1:8200 -method=userpass username=admin passw
 
 [source,bash,role=execute]
 ----
-vault write auth/approle/role/terraform policies=terraform-policy
+vault write auth/approle/role/terraform token_policies=terraform-policy
 ----
 
 * Now get the Role ID and Secret ID for the AppRole for Terraform Enterprise:
@@ -233,6 +233,12 @@ In this task we will create an Application Role in Vault Enterprise (AppRole) fo
 
 Before creating the Application Role, we need to create a `Policy` that will allow the Ansible Automation Platform to read the secret from the Vault secret engine.
 
+* Back in the Vault Enterprise UI, click on the `Policies` menu option in the left menu.
+* Click on the `ACL Policies` menu option in the left menu.
+* Click on the `Create ACL policy +` button on the right.
+* For the `Name` field, enter `aap-policy`
+* Enter the following into the `Policy` body:
+
 [source,hcl,role=execute]
 ----
 # Allow AAP to read SSH keys
@@ -251,6 +257,8 @@ path "secret/data/*/metadata" {
 ----
 
 * Click on the `Create policy` button.
+
+image::aappolicy.png[]
 
 You have now created a new policy for Ansible Automation Platform to read the secret from the Vault secret engine.
 
@@ -278,7 +286,7 @@ vault login -address=http://127.0.0.1:8200 -method=userpass username=admin passw
 
 [source,bash,role=execute]
 ----
-vault write auth/approle/role/aap policies=aap-policy
+vault write auth/approle/role/aap token_policies=aap-policy
 ----
 
 * Now get the Role ID and Secret ID for the AppRole for (Ansible Automation Platform):
