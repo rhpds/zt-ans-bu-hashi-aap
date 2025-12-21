@@ -147,24 +147,54 @@ path "auth/token/lookup-self" {
 }
 ----
 
-* Click on the `Authentication` menu option in the left menu.
-* Click on the `AppRole` menu option.
-* Click on the `+ Create role` button.
-* Enter the following details:
+* Click on the `Create policy` button.
+image::terraformpolicy.png[]
 
-|===
-| Field | Value 
-| Role Name
-| terraform-enterprise
-|===
+You have now created a new policy for the Terraform Enterprise to read the secret from the Vault secret engine.
 
-* Click on the `Create` button.
+Now let's enable the AppRole authentication method in Vault Enterprise UI.
 
-image::vaultapprole1.png[]
+* Select the `Access` menu option in the left menu.
+* Click on the `Authentication Methods` menu option in the left menu.
+* Click on the `+ Enable new method +` button on the right.
+* Click on the `AppRole` tile.
 
-* Click on the `Role ID` button.
-* Copy the Role ID to your clipboard.
+image::approle1.png[]
 
-image::vaultapprole2.png[]
+* In the `Path` field, keep it at the default of `approle`
+* Click on `Eanble method` to enable the AppRole authentication method
 
-* Click on the `Secret ID` button.
+image::approle2.png[]
+
+NOTE: The Vault UI only supports the configuration of the AppRole authentication method. You will need to use the Vault CLI to create the Application Role.
+
+image::approle3.png[]
+
+* Open the `TERMINAL` tab from your lab
+* You will be at the `vscode` terminal prompt
+* SSH to the `vault` server by typing `ssh rhel@vault`, type `yes` when prompted
+
+[source,bash,role=execute]
+----
+ssh rhel@vault
+----
+
+* Type `yes` when prompted to continue
+* Enter the password `ansible123!` when prompted
+
+* Run the following command to login to the Vault CLI (if you are not already logged in):
+
+[source,bash,role=execute]
+----
+export VAULT_ADDR=http://127.0.0.1:8200
+vault login -address=http://127.0.0.1:8200 -method=userpass username=admin password=ansible123!
+----
+
+* Run the following command to create the Application Role:
+
+[source,bash,role=execute]
+----
+vault write auth/approle/role/terraform policies=terraform-policy
+----
+
+* You have now created an Application Role in Vault Enterprise (AppRole) for Terraform Enterprise so that Terraform Enterprise can authenticate against the Vault secret engine.
