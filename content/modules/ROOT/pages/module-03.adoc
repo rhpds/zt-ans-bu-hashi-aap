@@ -4,5 +4,167 @@
 
 In this challenge you will learn how to trigger infrastructure provisioning and automation from Terraform Enterprise.
 
+There are a number of prerequisites that you will need to complete before you can start this lab.
+
+* Vault Enterprise
+* Terraform Enterprise
+** Cloning a GitHub repository to your account
+** Create a Terraform Enterprise Workspace that used Version Control System (VCS) to store the Terraform code
+
 [#task1]
-== How to trigger infrastructure provisioning and automation from Terraform Enterprise
+== Configure the Vault Enterprise Secret Engine
+
+Open the Vault Enterprise UI in your browser.
+In the `Method` dropdown, select `Userpass`.
+Enter the following details to login to the Vault Enterprise UI.
+
+* `User:  admin`
+* `Password:  ansible123!`
+* Click on the `Sign In` button.
+
+image::vaultlogin.png[]
+
+* Click on the `Vault` menu option in the left menu.
+* Click on the `Secrets Engines` menu option.
+* Click on the `+ Enable new engine` button.
+
+image::vaultengine1.png[]
+
+* Select the `KV` secrets engine from the `Generic` section.
+Enter the following details:
+
+|===
+| Field | Value
+
+| Path
+| secret
+
+| Version
+| 2
+|===
+
+* Scroll down and in the `Version` dropdown, select `2`. (This is the latest version of the KV secrets engine.) Must be 2.
+* Scroll down and click on the `Enable Engine` button.
+
+image::vaultengine2.png[]
+
+=== Create a new secret for your AWS keys in this secret engine
+
+* Select the `Create secret +` option on the right
+* In the `Path for this secret` field, enter `aws_creds`
+* In the `Secret data` section, enter the following details:
+
+* Get the AWS Access Key ID and AWS Secret Access Key from the `Cloud(AWS)` tab in your lab.
+|===
+| Field | Value
+
+| access_key
+| <Your AWS Access Key ID>
+
+| secret_key
+| <Your AWS Secret Access Key>
+|===
+
+* Click on the `Save` button.
+
+image::vaultawscreds.png[]
+
+You have now created a new secret for your AWS keys in the Vault secret engine. You can now use these keys to authenticate against the AWS cloud account.
+
+=== Validate that you can read the secret from the Vault secret engine
+
+Let's validate that you can read the secret from the Vault secret engine by using the Vault CLI.
+
+* Open the `TERMINAL` tab from your lab
+* You will be at the `vscode` terminal prompt
+* SSH to the `vault` server by typing `ssh rhel@vault`, type `yes` when prompted
+
+[source,bash,role=execute]
+----
+ssh rhel@vault
+----
+
+* Type `yes` when prompted to continue
+* Enter the password `ansible123!` when prompted
+* Run the following commands to login to the Vault CLI:
+
+[source,bash,role=execute]
+----
+export VAULT_ADDR=http://127.0.0.1:8200
+vault login -address=http://127.0.0.1:8200 -method=userpass username=admin password=ansible123!
+----
+
+* You are now logged in to the Vault CLI.
+* Run either of the following commands to read the secret from the Vault secret engine:
+
+[source,bash,role=execute]
+----
+vault kv get secret/aws_creds
+
+OR
+
+vault kv get -mount=secret aws_creds
+----
+
+image::vaultawscreds2.png[]
+
+You should see the AWS Access Key ID and AWS Secret Access Key in the output.
+
+=== Create an Application Role in Vault Enterprise (AppRole) for Terraform Enterprise
+
+In this task we will create an Application Role in Vault Enterprise (AppRole) for Terraform Enterprise so that Terraform Enterprise can authenticate against the Vault secret engine.
+
+Before creating the Application Role, we need to create a `Policy` that will allow the Terraform Enterprise to read the secret from the Vault secret engine.
+
+* Back in the Vault Enterprise UI, click on the `Policies` menu option in the left menu.
+* Click on the `ACL Policies` menu option in the left menu.
+* Click on the `Create ACL policy +` button on the right.
+* For the `Name` field, enter `terraform-policy`
+* Enter the following into the `Policy` body:
+
+[source,hcl,role=execute]
+----
+# Read AWS credentials
+path "secret/data/aws_creds" {
+  capabilities = ["read"]
+}
+# Write SSH keys
+path "secret/data/*/ssh-keys/*" {
+  capabilities = ["create", "read", "update", "delete"]
+}
+path "secret/data/rhel-server/ssh-keys/*" {
+  capabilities = ["create", "read", "update", "delete"]
+}
+# Allow creating child tokens 
+path "auth/token/create" {
+  capabilities = ["create", "update"]
+}
+path "auth/token/renew-self" {
+  capabilities = ["update"]
+}
+path "auth/token/lookup-self" {
+  capabilities = ["read"]
+}
+----
+
+* Click on the `Authentication` menu option in the left menu.
+* Click on the `AppRole` menu option.
+* Click on the `+ Create role` button.
+* Enter the following details:
+
+|===
+| Field | Value 
+| Role Name
+| terraform-enterprise
+|===
+
+* Click on the `Create` button.
+
+image::vaultapprole1.png[]
+
+* Click on the `Role ID` button.
+* Copy the Role ID to your clipboard.
+
+image::vaultapprole2.png[]
+
+* Click on the `Secret ID` button.
