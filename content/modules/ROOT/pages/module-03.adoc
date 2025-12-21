@@ -162,7 +162,7 @@ Now let's enable the AppRole authentication method in Vault Enterprise UI.
 image::approle1.png[]
 
 * In the `Path` field, keep it at the default of `approle`
-* Click on `Eanble method` to enable the AppRole authentication method
+* Click on `Enable method` to enable the AppRole authentication method
 
 image::approle2.png[]
 
@@ -182,7 +182,7 @@ ssh rhel@vault
 * Type `yes` when prompted to continue
 * Enter the password `ansible123!` when prompted
 
-* Run the following command to login to the Vault CLI (if you are not already logged in):
+* Run the following command to login to the Vault CLI (**if you are not already logged in**):
 
 [source,bash,role=execute]
 ----
@@ -197,7 +197,7 @@ vault login -address=http://127.0.0.1:8200 -method=userpass username=admin passw
 vault write auth/approle/role/terraform policies=terraform-policy
 ----
 
-* Now get the Role ID and Secret ID for the AppRole:
+* Now get the Role ID and Secret ID for the AppRole for Terraform Enterprise:
 
 [source,bash,role=execute]
 ----
@@ -208,7 +208,7 @@ then
 vault write -f auth/approle/role/terraform/secret-id
 ----
 
-* Copy the Role ID and Secret ID to your clipboard.  You will need these momentarily
+* Copy the Role ID and Secret ID to your clipboard. You will need these momentarily
 
 ==== Test the AppRole authentication method
 
@@ -224,4 +224,86 @@ vault write auth/approle/login \
 image::approle4.png[]
 
 * You have now created an Application Role in Vault Enterprise (AppRole) for Terraform Enterprise so that Terraform Enterprise can authenticate against the Vault secret engine.
+
+We need to repeat this process to create an AppRole for Ansible Automation Platform.
+
+=== Create an Application Role in Vault Enterprise (AppRole) for Ansible Automation Platform
+
+In this task we will create an Application Role in Vault Enterprise (AppRole) for Ansible Automation Platform so that Ansible Automation Platform can authenticate against the Vault secret engine.
+
+Before creating the Application Role, we need to create a `Policy` that will allow the Ansible Automation Platform to read the secret from the Vault secret engine.
+
+[source,hcl,role=execute]
+----
+# Allow AAP to read SSH keys
+path "secret/data/rhel-server/ssh-keys/*" {
+  capabilities = ["read"]
+}
+
+path "secret/data/*/ssh-keys/*" {
+  capabilities = ["read"]
+}
+
+# Allow AAP to write instance metadata
+path "secret/data/*/metadata" {
+  capabilities = ["create", "read", "update"]
+}
+----
+
+* Click on the `Create policy` button.
+
+You have now created a new policy for Ansible Automation Platform to read the secret from the Vault secret engine.
+
+* Open the `TERMINAL` tab from your lab
+* You will be at the `vscode` terminal prompt
+* SSH to the `vault` server by typing `ssh rhel@vault`, type `yes` when prompted
+
+[source,bash,role=execute]
+----
+ssh rhel@vault
+----
+
+* Type `yes` when prompted to continue
+* Enter the password `ansible123!` when prompted
+
+* Run the following command to login to the Vault CLI (**if you are not already logged in**):
+
+[source,bash,role=execute]
+----
+export VAULT_ADDR=http://127.0.0.1:8200
+vault login -address=http://127.0.0.1:8200 -method=userpass username=admin password=ansible123!
+----
+
+* Run the following command to create the AppRole for Ansible Automation Platform:
+
+[source,bash,role=execute]
+----
+vault write auth/approle/role/aap policies=aap-policy
+----
+
+* Now get the Role ID and Secret ID for the AppRole for (Ansible Automation Platform):
+
+[source,bash,role=execute]
+----
+vault read auth/approle/role/aap/role-id
+
+then
+
+vault write -f auth/approle/role/aap/secret-id
+----
+
+* Copy the Role ID and Secret ID to your clipboard. You will need these momentarily
+
+==== Test the AppRole authentication method
+
+Let's test the AppRole authentication method by using the Vault CLI.
+
+[source,bash,role=execute]
+----
+vault write auth/approle/login \
+    role_id=<aap-role-id> \
+    secret_id=<aap-secret-id>
+----
+
+* You have now created an Application Role in Vault Enterprise (AppRole) for Ansible Automation Platform so that Ansible Automation Platform can authenticate against the Vault secret engine.
 
