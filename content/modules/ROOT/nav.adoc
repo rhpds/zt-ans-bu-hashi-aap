@@ -20,6 +20,6 @@
 ** xref:module-03.adoc#task2[Configure Ansible Automation Platform to use the AppRole authentication method]
 
 * xref:module-04.adoc[4. Trigger Infrastructure Provisioning and automation from Terraform Enterprise - Part 2]
-** xref:module-04.adoc#task1[What is HashiCorp Vault Enterprise]
-** xref:module-04.adoc#task2[How to bring in HashiCorp Vault Enterprise to your automation pipeline]
-** xref:module-04.adoc#task3[How to use HashiCorp Vault Enterprise in your automation pipeline]
+** xref:module-04.adoc#task1[Clone the GitHub repository to your account]
+** xref:module-04.adoc#task2[Set up the Terraform Enterprise Workspace]
+** xref:module-04.adoc#task3[Trigger infrastructure provisioning and automation]

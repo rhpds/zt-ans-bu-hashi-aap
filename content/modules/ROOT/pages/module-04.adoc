@@ -2,16 +2,12 @@
 
 = Trigger Infrastructure Provisioning and automation from Terraform Enterprise - Part 2
 
-In this challenge you will learn how to trigger infrastructure provisioning and automation from Terraform Enterprise.
-
-There are a number of prerequisites that you will need to complete before you can start this lab.
-
 In this part we will continue the prerequisites and put the final touches on the Terraform Enterprise Workspace.
 
 * Terraform Enterprise
 ** Cloning a GitHub repository to your account
-** Create a Terraform Enterprise Workspace that used Version Control System (VCS) to store the Terraform code
-
+** Create a Terraform Enterprise Workspace that uses Version Control System (VCS, in this case GitHub) to store the Terraform code
+** Trigger Terraform infrastructure provisioning and automation by committing changes to the Terraform code in the GitHub repository.
 
 
 
@@ -19,12 +15,55 @@ In this part we will continue the prerequisites and put the final touches on the
 In this challenge you will learn how to bring in HashiCorp Vault Enterprise to your automation pipeline.
 
 [#task1]
-== What is HashiCorp Vault Enterprise?
+== Clone the GitHub repository to your account
 
-HashiCorp Vault Enterprise is a tool that allows you to manage secrets and other sensitive data.
+NOTE: You can perform this task in the `TERMINAL` tab from your lab environment (on the vscode terminal prompt), in VS Code directly tab in your lab environment, OR you can do this directly in the GitHub web interface. Whatever is easier for you.
+
+The following repository contains the Terraform code for the infrastructure you will be provisioning.
+
+* https://github.com/ansible-tmm/aap-hashi-lab-2.git
+
+[source,bash,role=execute]
+----
+git clone https://github.com/ansible-tmm/aap-hashi-lab-2.git
+cd aap-hashi-lab-2
+----
+
+Later in this lab, you will be committing changes to the Terraform code in the GitHub repository, which in turn will trigger the Terraform infrastructure provisioning and automation, and will leverage secrets from Vault Enterprise.
 
 [#task2]
-== How to bring in HashiCorp Vault Enterprise to your automation pipeline
+== Set up the Terraform Enterprise Workspace
+
+Back in the Terraform Enterprise UI, click on the `Workspaces` menu option in the left menu.
+
+Click on the `New` button on the right, and select `Workspace` from the dropdown.
+Enter the following details:
+* For the `Project` field, select `rhdp-initial-project` from the dropdown, and select `Create`
+
+image::workspace1.png[]
+
+* On the next screen choose `Version Control Workflow`For the Workspace type
+
+image::workspace2.png[]
+
+Now you will need to configure the Workspace to use the GitHub repository you cloned earlier into your GitHub account.
+
+* Select the `GitHub` option from the dropdown, and then click on the `GitHub.com` button.
+
+ `Name` field, enter `aap-hashi-lab-2`
+* For the `Description` field, enter `Terraform Enterprise Workspace for the AAP and HashiCorp Lab`
+* For the `VCS Provider` field, select `GitHub`
+* For the `Repository` field, enter `https://github.com/ansible-tmm/aap-hashi-lab-2.git`
+* Click on the `Create` button.
+
+
+
+
+
+
+
 
 [#task3]
-== How to use HashiCorp Vault Enterprise in your automation pipeline
+== Trigger infrastructure provisioning and automation
+
+
