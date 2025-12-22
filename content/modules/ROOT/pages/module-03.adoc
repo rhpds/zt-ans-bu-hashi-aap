@@ -320,6 +320,7 @@ vault write auth/approle/login \
 
 You have now created an Application Role in Vault Enterprise (AppRole) for Ansible Automation Platform so that Ansible Automation Platform can authenticate against the Vault secret engine.
 
+[#task2]
 == Configure Ansible Automation Platform to use the AppRole authentication method
 
 In this task we will configure Ansible Automation Platform to use the AppRole authentication method to authenticate against the Vault secret engine.
