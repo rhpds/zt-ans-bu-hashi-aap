@@ -217,7 +217,7 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 . For the `Name` enter `Terraform Enterprise credential`
 . Expand the `Credential Type` drop-down, and select `Terraform Enterprise credential type`
 . In the `Terraform Enterprise Hostname` section enter `**<Your terraform hostname url>**`
-. In the `Organization` section enter `**rhdp-tf-org**`
+. In the `Organization` (**Terraform Organization**) section enter `**rhdp-tf-org**`
 . In the `Workspace` section enter `**TFE-Demo**`
 . In the `Token` section enter the API token you generated earlier in Terraform Enterprise
 . Click on `Create credential` to save the credential
@@ -234,7 +234,7 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 | Terraform Enterprise Hostname
 | **<Your terraform hostname url>** # This will look like: https://tfe-https-12345-a.apps.#######.rhdp.net
 
-| Organization
+| Organization (**Terraform Organization**)
 | **rhdp-tf-org**
 
 | Workspace
@@ -378,6 +378,9 @@ Fill out the following fields:
 
 | Name
 | WF-Terraform Enterprise APPLY
+
+| Organization
+| Default
 |===
 
 Scroll to the bottom Click the blue `Create Workflow Job Template` button to **save** the Workflow.
