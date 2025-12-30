@@ -25,6 +25,10 @@ There are `several prerequisites` that you will need to complete before you can 
 * Terraform Enterprise prerequisites
 * Ansible Automation Platform prerequisites
 
+The follwoing diagram shows the overall scenario that we will be covering in this lab section.
+
+image::module1scenario.png[]
+
 [#task1]
 == Create the Terraform Enterprise API token
 
@@ -380,7 +384,7 @@ Fill out the following fields:
 | WF-Terraform Enterprise APPLY
 
 | Organization
-| Default
+| **Default**
 |===
 
 Scroll to the bottom Click the blue `Create Workflow Job Template` button to **save** the Workflow.
@@ -481,6 +485,9 @@ Fill out the following fields:
 
 | Name
 | WF-Terraform Enterprise DESTROY
+
+| Organization
+| **Default**
 |===
 
 Scroll to the bottom Click the blue `Create Workflow Job Template` button to **save** the Workflow.
