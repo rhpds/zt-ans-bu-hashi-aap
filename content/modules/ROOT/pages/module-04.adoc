@@ -2,6 +2,8 @@
 
 = How to create a HashiCorp-enabled Execution Environment
 
+**NO HANDS-ON TASKS IN THIS LAB SECTION. EDUCATIONAL ONLY. This is a lab section to discuss how to create an Execution Environment that will enable Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise usage in Ansible Automation Platform.**
+
 In this challenge we will discuss how to create an Execution Environment that will enable Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise usage in Ansible Automation Platform. It will include all the dependencies needed.
 
 [#task1]
