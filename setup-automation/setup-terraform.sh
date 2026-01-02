@@ -10,25 +10,9 @@ set -e
 # Configuration
 YAML_FILE="/etc/containers/systemd/tfe.yaml"
 
-echo "Updating TFE_LICENSE value in $YAML_FILE..."
-
-# Use awk to update the value after the TFE_LICENSE name
-awk -v new_license="$TFE_LIC" '
-/- name: TFE_LICENSE/ {
-    print
-    getline
-    if ($1 == "value:") {
-        print "      value: " new_license
-    } else {
-        print
-    }
-    next
-}
-{ print }
-' "$YAML_FILE" > "${YAML_FILE}.tmp"
-
-# Replace original file with updated one
-mv "${YAML_FILE}.tmp" "$YAML_FILE"
+sed -i '/- name: TFE_LICENSE/,/value:/ {
+    s/value:.*/value: "'"$TFE_LIC"'"/
+}' "$YAML_FILE"
 
 systemctl daemon-reload
 systemctl restart terraform-enterprise
