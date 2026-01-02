@@ -25,8 +25,8 @@ spec:
           value: disk
         - name: TFE_LICENSE
           value: "$TFE_LIC"
-        - name: TFE_LICENSE_PATH
-          value: /etc/terraform-enterprise/license.hclic
+        # - name: TFE_LICENSE_PATH
+        #   value: /etc/terraform-enterprise/license.hclic
         - name: TFE_HOSTNAME
           value: rheltfe
         - name: TFE_HTTP_PORT
