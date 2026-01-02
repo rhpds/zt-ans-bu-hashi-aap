@@ -4,6 +4,8 @@ HOSTNAME=tfe-https-${GUID}.apps.ocpvdev01.rhdp.net
 
 #sed -i "/name: \"TFE_HOSTNAME\"/!b;n;s/value: \".*\"/value: \"$HOSTNAME\"/" /etc/containers/systemd/tfe.yaml
 
+echo "$TFE_LIC" | podman login --username terraform --password-stdin images.releases.hashicorp.com
+
 mv /etc/containers/systemd/tfe.yaml /etc/containers/systemd/tfe_old.yaml
 
 cat > "/etc/containers/systemd/tfe.yaml" << EOF
