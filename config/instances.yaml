@@ -1,5 +1,5 @@
 ---
-containers:
+# containers:
   # - name: gitea
   #   image: gitea/gitea:1.16.8-rootless
   #   ports:
