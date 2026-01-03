@@ -53,13 +53,6 @@ auth: none
 cert: false
 EOF
 
-tee /etc/systemd/system/code-server@rhel.service.d/override.conf << EOF
-[Service]
-ExecStart=
-ExecStart=/usr/bin/code-server /home/rhel/lab_exercises
-EOF
-
-systemctl daemon-reload
 systemctl start code-server
 dnf install unzip nano git podman -y 
 
