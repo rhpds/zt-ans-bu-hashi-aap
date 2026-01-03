@@ -18,6 +18,8 @@ ingress:
     port: 8200
   - protocol: TCP
     port: 9090
+  - protocol: TCP
+    port: 8800
 egress:
 - ports:
   - protocol: TCP
@@ -36,3 +38,5 @@ egress:
     port: 8200
   - protocol: TCP
     port: 9090
+  - protocol: TCP
+    port: 8800

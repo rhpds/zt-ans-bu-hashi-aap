@@ -1,35 +1,18 @@
 ---
-
-antora:
-  name: modules
-  dir: www
-  modules:
-    - name: module-01
-      label: "Terraform Enterprise & Red Hat Ansible Automation Platform"
-      solveButton: false
-    - name: module-02
-      label: "How to create a HashiCorp-enabled Execution Environment"
-      solveButton: false
-    - name: module-03
-      label: "Trigger Infrastructure Provisioning and automation from Terraform Enterprise"
-      solveButton: false
-    - name: module-04
-      label: "Bring in HashiCorp Vault Enterprise to your automation pipeline"
-      solveButton: false
-
+type: showroom
 tabs:
   - name: Ansible Automation Platform
     url: https://control-${guid}.${domain}/
     external: true
   - name: Terraform Enterprise (TFE)
     url: https://tfe-https-${guid}.${domain}/session
-    external: true 
-  - name: VS Code
-    url: https://vscode-${guid}.${domain}
-    external: false
+    external: true
   - name: HashiCorp Vault
     url: https://vault-${guid}.${domain}/ui/vault/unseal
     external: true
+  - name: VS Code
+    url: https://vscode-${guid}.${domain}
+    external: false
   - name: "TERMINAL"
     url: /wetty_vscode
   - name: Cloud (AWS)
