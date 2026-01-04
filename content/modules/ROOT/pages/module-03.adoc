@@ -35,15 +35,17 @@ Later in this lab, you will be committing changes to the Terraform code in the G
 [#task2]
 == Set up the Terraform Enterprise Workspace
 
+We now want to create a new Terraform Enterprise Workspace that uses Version Control System (VCS). By doing this, you will be able to trigger the Terraform infrastructure provisioning and Ansible automation by committing changes to the Terraform code in the GitHub repository that you imported earlier.
+
 Back in the Terraform Enterprise UI, click on the `Workspaces` menu option in the left menu.
 
-Click on the `New` button on the right, and select `Workspace` from the dropdown.
-Enter the following details:
+* Click on the `New` button on the right, and select `Workspace` from the dropdown.
+* Enter the following details:
 * For the `Project` field, select `rhdp-initial-project` from the dropdown, and select `Create`
 
 image::workspace1.png[]
 
-* On the next screen choose `Version Control Workflow`For the Workspace type
+* On the next screen choose `Version Control Workflow` for the Workspace type
 
 image::workspace2.png[]
 

@@ -12,7 +12,7 @@
 ** xref:module-02.adoc#task2[Configure Ansible Automation Platform to use the AppRole authentication method]
 
 * xref:module-03.adoc[3. Trigger Infrastructure Provisioning and automation from Terraform Enterprise - Part 2]
-** xref:module-03.adoc#task1[Clone the GitHub repository to your account]
+** xref:module-03.adoc#task1[Import the GitHub repository to your account]
 ** xref:module-03.adoc#task2[Set up the Terraform Enterprise Workspace]
 ** xref:module-03.adoc#task3[Trigger infrastructure provisioning and automation]
 
