@@ -385,8 +385,6 @@ image::aapvaultsshcred2.png[]
 
 * Click on the `Create credential` button. You will see a summary of the credential you just created
 
-image::aapvaultsshcred3.png[]
-
 Don't worry about testing this credential yet, as it will error out until there are some SSH private_keys in the Vault secret engine.
 
 [#task3]
@@ -394,14 +392,16 @@ Don't worry about testing this credential yet, as it will error out until there 
 
 In this task we will create a Job Template and Workflow template that will be triggered by Terraform Enterprise.
 
-=== Duplicate the `Install Nginx on RHEL` job template
+=== Duplicate the **"Install Nginx on RHEL"** job template
 
 Click on the `Ansible Automation Platform` tab at the top of lab. (if not already) Expand the `Automation Execution` menu on the left. `Automation Execution` -> `Templates`.
 
 * Now click on `Elipsis` at the end of the `Install Nginx on RHEL` job template and select `Duplicate template`.
 * Edit this duplicated Job Template and make 2 small changes
 ** Change the `Name` field to `Install Nginx on RHEL - TFE-VCS`
-** Change the `Credentials` field, remove existing credential, and add the `Vault MACHINE SSH credential` we created earlier
+** Change the `Credentials` field:
+*** REMOVE the existing SSH Credential
+*** ADD the `Vault MACHINE SSH credential` we created earlier
 * Click on the `Save job template` button to save the job template
 
 image::updatedjt.png[]
@@ -414,15 +414,20 @@ image::updatedjt.png[]
 | Field | Value
 
 | Name
-| WF-Launched by TFE
+| **WF-Launched by TFE**   (Please use that name exactly)
 
 | Organization
 | **Default**
+
+| Inventory
+| Ckeck the **Prompt on launch** checkbox
 |===
 
 * Click on the `Create workflow job template` button to save the workflow job template
 
 image::newwjt.png[]
+
+NOTE: `Prompt on launch` is needed because Terraform Enterprise cannot supply or override Ansible job template variables unless Ansible Automation Platform explicitly allows it. Without `Prompt on launch`, Ansible Automation Platform treats the job template as fully static, and external systems (like Terraform Enterprise) are blocked from injecting runtime values.
 
 === Create the nodes for the `WF-Launched by TFE` workflow template
 
