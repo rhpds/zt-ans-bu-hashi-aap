@@ -4,9 +4,11 @@
 
 In this part we will continue the prerequisites and put the final touches on the Terraform Enterprise Workspace.
 
-The follwoing diagram shows the overall scenario that we started in the previous lab section. Let's work through to completion of this scenario.
+The follwoing diagram shows the overall scenario that we started in the previous lab section.
 
 image::module2-3scenario.png[]
+
+Let's work through to completion of this scenario.
 
 * Terraform Enterprise
 ** Import a GitHub repository to your account
@@ -30,12 +32,12 @@ image::importrepo.png[]
 * Scroll down and enter a `Repository name` for your new repository, in this case: `aap-hashi-lab-2` (or another name if you prefer)
 * Click on the `Begin import` button to import the repository to your account.
 
-Later in this lab, you will be committing changes to the Terraform code in the GitHub repository, which in turn will trigger the Terraform infrastructure provisioning and automation, and will leverage secrets from Vault Enterprise.
+Later in this lab, you will be committing changes to the Terraform code in the GitHub repository, which in turn will trigger the Terraform infrastructure provisioning and automation, and will retrieve secrets from Vault Enterprise.
 
 [#task2]
 == Set up the Terraform Enterprise Workspace
 
-We now want to create a new Terraform Enterprise Workspace that uses Version Control System (VCS). By doing this, you will be able to trigger the Terraform infrastructure provisioning and Ansible automation by committing changes to the Terraform code in the GitHub repository that you imported earlier.
+We now want to create a new Terraform Enterprise Workspace that uses *Version Control System (VCS)* to store the Terraform code. By doing this, you will be able to trigger the Terraform infrastructure provisioning and Ansible automation by committing changes to the Terraform code in the GitHub repository that you imported earlier.
 
 Back in the Terraform Enterprise UI, click on the `Workspaces` menu option in the left menu.
 
@@ -58,7 +60,7 @@ Now you will need to configure the Workspace to use the GitHub repository you cl
 
 image::workspace3.png[]
 
-* Authenticate to `your GitHub account`, and authorize the Terraform Enterprise application to access your GitHub account.
+* Authenticate to `your GitHub account`, and authorize the Terraform Enterprise OAuth application to access your GitHub account.
 * **It will have automatically populated some of the fields for you as they relate to Terraform Enterprise**
 * Scroll down and click on the `Register application` button
 
@@ -71,6 +73,7 @@ image::workspace4.png[]
 image::workspace5.png[]
 
 BACK in the `Terraform Enterprise UI`, please do the following:
+
 * For the `Name` field, enter your initials, followed by dash and github, example: `jdoe-github`
 * Paste the `Client ID` to the Client ID field.
 * Paset the `Client Secret` to the Client Secret field.
