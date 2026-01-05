@@ -419,7 +419,7 @@ image::updatedjt.png[]
 | Organization
 | **Default**
 
-| Inventory
+| **Inventory**
 | Ckeck the **Prompt on launch** checkbox
 |===
 
