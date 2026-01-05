@@ -438,4 +438,4 @@ NOTE: `Prompt on launch` is needed because Terraform Enterprise cannot supply or
 
 image::newwjt2.png[]
 
-Now we're all set to trigger the infrastructure provisioning and automation from Terraform Enterprise, later in the next lab section.
+Now we're ALMOST SET to trigger the infrastructure provisioning and automation from Terraform Enterprise, later in the next lab section.
