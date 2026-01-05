@@ -99,7 +99,7 @@ image::workspace6-1.png[]
 | Using GitHub commits to trigger Plan/Apply Runs
 
 | Terraform Working Directory
-| TF_templates/AWS/
+| **TF_templates/AWS/**
 |===
 
 * Scroll down the bottom of the screen and click on the `Create` button to save the workspace configuration
@@ -131,7 +131,7 @@ image::workspace10.png[]
 | Field | Value | Sensitive
 
 | vault_addr
-| Add your vault host here, example: https://vault-48hl9-1.apps.ocpvdev01.rhdp.net
+| Add **YOUR VAULT host here**, example: `https://vault-guid#-1.apps.ocpvdev01.rhdp.net`
 | No
 
 | vault_role_id
@@ -143,7 +143,7 @@ image::workspace10.png[]
 | Yes
 
 | aap_host
-| Add your AAP host here, example: https://control-48hl9-1.apps.ocpvdev01.rhdp.net
+| Add **YOUR AAP host here**, example: `https://control-guid#-1.apps.ocpvdev01.rhdp.net
 | No
 
 | aap_username

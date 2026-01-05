@@ -123,6 +123,8 @@ In this task we will create an Application Role in Vault Enterprise (AppRole) fo
 
 Before creating the Application Role, we need to create a `Policy` in Vault Enterprise.
 
+NOTE: **For simplicity**, In this lab we will create a single policy for both Terraform Enterprise and Ansible Automation Platform. In a production environment, you would create a separate policy for each system.
+
 * Back in the Vault Enterprise UI, click on the `Policies` menu option in the left menu.
 * Click on the `ACL Policies` menu option in the left menu.
 * Click on the `Create ACL policy +` button on the right.
@@ -216,6 +218,7 @@ vault login -address=http://127.0.0.1:8200 -method=userpass username=admin passw
 vault write auth/approle/role/aapterraform token_policies=aap-terraform-policy
 ----
 
+* You should see the following output: `Success! Data written to: auth/approle/role/aapterraform`
 * Now get the `Role ID` and `Secret ID` for the AppRole:
 
 [source,bash,role=execute]
@@ -242,14 +245,16 @@ vault write auth/approle/login \
 
 image::approle4.png[]
 
-You have now created an Application Role (AppRole) in Vault Enterprise. Ansible Automation Platform and Terraform Enterprise can use this to authenticate against the Vault secret engine.
+You have now created an Application Role (AppRole) in Vault Enterprise. Ansible Automation Platform and Terraform Enterprise can now authenticate securely against the Vault secret engine.
 
 [#task2]
 == Configure Ansible Automation Platform to use the AppRole authentication method
 
 In this task we will configure Ansible Automation Platform to use the AppRole authentication method to securely authenticate against the Vault secret engine.
 
-=== Create a new credential in Ansible Automation Platform to use the AppRole authentication method. This will be named`Vault lookup credential`
+=== Create a new credential in Ansible Automation Platform to use the AppRole authentication method
+
+Create a new credential in Ansible Automation Platform to use the AppRole authentication method. This will be named `Vault lookup credential`
 
 * Open the `Ansible Automation Platform` tab in your lab
 * Click on the `Automation Execution` menu option in the left menu.
@@ -258,7 +263,7 @@ In this task we will configure Ansible Automation Platform to use the AppRole au
 * Click on the `+ Create credential` button on the right.
 * For the `Name` field, enter `Vault lookup credential`
 * For the `Credential Type` field, select `HashiCorp Vault Secret Lookup`
-* For the `Server URL` field, enter `http://vault:8200`
+* For the `Server URL` field, enter **YOUR VAULT host here**, example: `https://vault-guid#-1.apps.ocpvdev01.rhdp.net`
 * For the `AppRole role_id` field, enter the `<generated role id>` you copied earlier
 * For the `AppRole secret_id` field, enter the `<generated secret id>` you copied earlier
 * Further below for the `Path to Auth` field, make sure it says `approle`
@@ -275,7 +280,7 @@ In this task we will configure Ansible Automation Platform to use the AppRole au
 | HashiCorp Vault Secret Lookup
 
 | Server URL
-| http://vault:8200
+| Add **YOUR VAULT host here**, example: `https://vault-guid#-1.apps.ocpvdev01.rhdp.net`
 
 | AppRole role_id
 | <generated role id>
