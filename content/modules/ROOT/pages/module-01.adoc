@@ -318,7 +318,7 @@ Click on the `Sync inventory source` button in the top right corner of the scree
 [#task6]
 == Create a Workflow Template to kick off a Terraform Enterprise `**PLAN and APPLY**` operation
 
-In this Task we will create an Ansible Job Template that will kick off a Terrafrom project, and then create the Workflow Template that will kick off the Job Template and then synchronize the inventory source.
+In this Task we will create an Ansible Job Template that will kick off a Terrafrom project, and then create the Workflow Template that will kick off the Job Template, followed by synchronizing the inventory source, and then another job template installing Nginx on the new EC2 instances.
 
 The Terraform project is a simple project that will leverage the AWS provider to create an EC2 instance in the AWS cloud account you are using.
 
@@ -428,6 +428,13 @@ Select the `Terraform Inventory`, and then click on the `Hosts` menu. Notice tha
 image::tfeapplyinventory.png[]
 
 === Validate the Nginx installation
+
+* From the Terraform Enterprise console, in the job run output you will see the resources that were created by Terraform.
+* From here get the public IP address (or DNS name) of the EC2 instance that was created by Terraform. 
+* You can also get the public IP address from the Ansible Automation Platform -> Inventory -> Terraform Inventory -> Hosts. Click on the host and then click on the `Details` tab.
+* Use `http` as the protocol.
+
+image::tfeapplyip.png[]
 
 * Open a browser tab and navigate to the public IP address of the EC2 instance that was created by Terraform. You will see the following page:
 
