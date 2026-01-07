@@ -234,7 +234,8 @@ image::tfewf1.png[]
 image::tfewf2.png[]
 
 * The Terraform Inventory in Ansible Automation Platform will be synchronized with the new resources.
-* The RHEL ec2 instances will have Ngninx installed and running on them.
+* The RHEL ec2 instances will have Nginx installed and running on them.
+* Feel free to navigate to the public IP address of the EC2 instances and verify the Nginx installation.
 
 == Summary
 The following scenario is what you competed in module 2 and module 3 of this lab.
