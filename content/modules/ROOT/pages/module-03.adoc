@@ -197,6 +197,7 @@ image::testplanonly2.png[]
 
 image::testplanonly3.png[]
 
+**GREAT! We are all set to commit changes to the Terraform code in the GitHub repository to trigger the infrastructure provisioning and automation.**
 
 === Commit changes to the Terraform code in the GitHub repository
 
