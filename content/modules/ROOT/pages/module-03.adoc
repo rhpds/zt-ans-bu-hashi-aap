@@ -240,7 +240,7 @@ image::tfewf2.png[]
 == Summary
 The following scenario is what you competed in module 2 and module 3 of this lab. 
 
-* You learn how to trigger infrastructure provisioning and automation from Terraform Enterprise using GitHub commits.
-* You also learned how to configure Ansible Automation Platform to retrieve secrets from HashiCorp Vault Enterprise. Here we retrieved the SSH private key for the RHEL ec2 instances to allow Ansible to connect to the instances and install Nginx.
+* You learned how to trigger infrastructure provisioning and automation from Terraform Enterprise using GitHub commits.
+* You also learned how to configure Ansible Automation Platform to retrieve secrets from HashiCorp Vault Enterprise. AAP retrieved the SSH private key for the RHEL ec2 instances, from Vault Enterprise, to allow Ansible to connect to the instances and install Nginx.
 
 image::module2-3scenario.png[]
