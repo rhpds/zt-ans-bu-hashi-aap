@@ -81,13 +81,13 @@ BACK in the `Terraform Enterprise UI`, please do the following:
 
 image::workspace6.png[]
 
-* You will be redirected to GitHub.com to authorize the Terraform Enterprise application to access your GitHub account, please authenticate and authorize!.
+* You will be redirected to GitHub.com to authorize the Terraform Enterprise application to access your GitHub account, please `authenticate and authorize`.
 * Scroll to the bottom of the screen and click on the `Skip and Finish` button
-* On the next screen, you will need to choose the repository you want to use for this workspace. For this lab, we will use the repository you imported earlier into your GitHub account
+* On the next screen, you will need to choose the repository you want to use for this workspace. For this lab, we will ***use the repository you imported earlier into your GitHub account**
 
 image::workspace6-1.png[]
 
-* On the following screen, you will need to provide the `Workspace Name`.  For this lab, we will use `TFE-Demo-VCS`
+* The Workspace Name will default ot the repository name. Change the `Workspace Name` to `TFE-Demo-VCS`
 * For the `Description` field, enter `Using GitHub commits to trigger Plan/Apply Runs`
 * Expand the `Advanced Options` section, and check both of the `Auto-apply` option checkboxes. This will automatically apply the changes to the workspace when you commit changes to the repository.
 * For the `Terraform Working Directory` field, enter `TF_templates/AWS/`
@@ -112,12 +112,15 @@ image::workspace6-1.png[]
 
 image::workspace7.png[]
 
-While you still have GitHub open, navigate to the repository you cloned earlier into your GitHub account please perform the following:
+* Scroll down the bottom of the screen and click on the `Create` button to save the workspace configuration
+
+While you still have the GitHub UI open, navigate to the repository you cloned earlier into your GitHub account please perform the following:
 
 * Navigate to the repository `SETTINGS` -> `WEBHOOKS`
 * You will see the Terraform Enterprise webhook configuration, click on the `Edit` button
-* Scroll down to the `SSL verification` section, and check the `Disable` checkbox
-* For the `Which events would you like to trigger this webhook?` section, select `Just the push event.`
+* Scroll down to the `SSL verification` section, and check the `Disable` checkbox. When prompted, click on the `I understand`
+* For the `Which events would you like to trigger this webhook?` section:
+** select `Just the push event.`
 * Scroll down and click on the `Update Webhook` button to save the webhook configuration
 * Authenticate to your GitHub account if prompted
 
@@ -180,6 +183,20 @@ image::workspacevars1.png[]
 == Trigger infrastructure provisioning and automation
 
 Now we're all set to trigger the infrastructure provisioning and automation from Terraform Enterprise by committing changes to the Terraform code in the GitHub repository, later in the next lab section.
+
+=== Perform a quick test run in the Terraform Enterprise Workspace
+
+Let's perform a quick test to make sure we set up the Terraform Enterprise Workspace correctly.  This will be a `Plan only` run, so we will not actually create any resources.
+
+* Click on the `+ New Run` button in the top right of the Workspace overview screen.
+* Click on the `Start` button to perform a quick test run of the Terraform code in the Terraform Enterprise Workspace.
+
+image::testplanonly2.png[]
+
+* You will see the plan run completed successfully.
+
+image::testplanonly3.png[]
+
 
 === Commit changes to the Terraform code in the GitHub repository
 
