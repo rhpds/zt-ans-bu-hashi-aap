@@ -1,12 +1,12 @@
 name: modules
-title: Terraform Enterprise & Red Hat Ansible Automation Platform
+title: Ansible Automation Platform and HashiCorp. Terraform, Vault, and AAP!
 version: master
 nav:
   - modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
-    lab_name: "Terraform Enterprise & Red Hat Ansible Automation Platform"
+    lab_name: "Ansible Automation Platform and HashiCorp. Terraform, Vault, and AAP!"
     release-version: master
     page-pagination: true
     my_var: "foo"
