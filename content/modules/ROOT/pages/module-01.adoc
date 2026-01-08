@@ -111,9 +111,8 @@ Click on the `+ Add variable` button.
 Enter the following details:
 
 * Select the `Environment variable` variable type.
-* In the `Key` field enter `AWS_ACCESS_KEY_ID`.
+* In the `Key` field enter `AWS_ACCESS_KEY_ID`
 * In the `Value` field enter the AWS Access Key ID. Get this from the `Cloud(AWS)` tab in your lab.
-* Select the `Sensitive` checkbox.
 * Click on `Add variable` to save the variable.
 
 image::tfevariables.png[]
