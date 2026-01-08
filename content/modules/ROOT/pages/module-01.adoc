@@ -253,7 +253,7 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 image::tfecred.png[]
 
 [#task5]
-== Terraform Inventory
+== Create a Terraform Inventory Source in Ansible Automation Platform
 
 An Inventory is a collection of hosts against which automation jobs may be launched.
 Inventories.
@@ -313,6 +313,7 @@ compose:
 
 * Scroll to the bottom Click the blue `Create source` button to **save** the Inventory Source.
 
+image::tfinventorysource0.png[]
 image::tfinventorysource.png[]
 
 * Click on the `Sync inventory source` button in the top right corner of the screen to synchronize the inventory source. You should see a status of `Success` shortly.
