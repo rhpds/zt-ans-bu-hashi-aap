@@ -10,7 +10,7 @@ image::module2-3scenario.png[]
 
 Let's work through to completion of this scenario.
 
-NOTE:  **You MUST have a github account to complete this lab.**
+NOTE:  You MUST have a github account to complete this lab.
 
 * Terraform Enterprise
 ** Import a GitHub repository to your account
@@ -23,6 +23,7 @@ In this challenge you will learn how to bring in HashiCorp Vault Enterprise to y
 == Import the GitHub repository to your account
 
 NOTE: To create your own UNLINKED GitHub repository, Use the GitHub.com UI to `IMPORT REPOSITORY` from an existing repository.
+
 The following repository contains the Terraform code for the infrastructure you will be provisioning.
 
 * https://github.com/ansible-tmm/aap-hashi-lab-2.git  # This is the repository you will be importing to your account
@@ -142,19 +143,7 @@ image::workspace10.png[]
 * On the next screen, add the following `Terraform variables`:
 
 |===
-| Field | Value | Sensitive
-
-| vault_addr
-| Add **YOUR VAULT host here**, example: `https://vault-guid#-1.apps.ocpvdev01.rhdp.net`
-| No
-
-| vault_role_id
-| <your vault role id>
-| No
-
-| vault_secret_id
-| <your vault secret id>
-| Yes
+| Key | Value | Sensitive
 
 | aap_host
 | Add **YOUR AAP host here**, example: `https://control-guid#-1.apps.ocpvdev01.rhdp.net`
@@ -174,6 +163,18 @@ image::workspace10.png[]
 
 | aws_secret_key
 | <your aws secret access key>
+| Yes
+
+| vault_addr
+| Add **YOUR VAULT host here**, example: `https://vault-guid#-1.apps.ocpvdev01.rhdp.net`
+| No
+
+| vault_role_id
+| <your vault role id>
+| No
+
+| vault_secret_id
+| <your vault secret id>
 | Yes
 |===
 

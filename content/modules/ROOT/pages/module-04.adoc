@@ -14,7 +14,8 @@ Automation execution environments create a common language for communicating aut
 In the previous challenge an Execution Environment called `Terraform Execution Environment` was already created for you. It included the new **hashicorp.terraform**, and **hashicorp.vault** collections, the Terraform binary, other cloud collections, and other dependencies.
 
 **We feel it's important to understand how to create an Execution Environment, for this specific scenario.**
-NOTE: *You can skip this challenge if you are not interested in learning how to create an Execution Environment.*
+
+NOTE: You can skip this challenge if you are not interested in learning how to create an Execution Environment.
 
 *To use HashiCorp Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise in YOUR Ansible Automation Platform environment you must create an Execution Environment* that includes the Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise collections, the Terraform binary, other cloud collections, and other dependencies.
 

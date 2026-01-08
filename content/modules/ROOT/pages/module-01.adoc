@@ -318,7 +318,7 @@ In this Task we will create an Ansible Job Template that will kick off a Terrafr
 
 The Terraform project is a simple project that will leverage the AWS provider to create an EC2 instance in the AWS cloud account you are using.
 
-NOTE: *Please note that you can also do this in Azure and Google Cloud in the same way as you are here with AWS*
+NOTE: Please note that you can also do this in Azure and Google Cloud in the same way as you are here with AWS
 
 === Create the `Terraform Enterprise APPLY` job template
 
@@ -401,7 +401,7 @@ image::wftemplateapply3.png[]
 
 * Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
 * For this next step keep the `Node Type` to `Job Template` and select the `Install Nginx on RHEL` job template. Select `Next` then `Finish` to save this step.
-** NOTE: The `Install Nginx on RHEL` job template is a job template that is already created for you in Ansible Automation Platform. It is used to install Nginx on the RHEL hosts.
+** The `Install Nginx on RHEL` job template is a job template that is already created for you in Ansible Automation Platform. It is used to install Nginx on the RHEL hosts.
 
 Click on the `Save` button to save the workflow template.
 
@@ -534,6 +534,6 @@ image::tfedestroy1.png[]
 * You created Workflow templates in Ansible Automation Platform that kick off Terraform Enterprise to provision cloud resources, and then Ansible Automation Platform performed further automation operations on the resources.
 * You created a Workflow template to destroy the resources created by Terraform.
 
-NOTE: **Even though this lab is focused on Terraform Enterprise and Ansible Automation Platform, you can also use HCP Terraform (also known as Terraform Cloud) and Ansible Automation Platform together in the EXACT SAME WAY!**
+NOTE: Even though this lab is focused on Terraform Enterprise and Ansible Automation Platform, you can also use HCP Terraform (also known as Terraform Cloud) and Ansible Automation Platform together in the EXACT SAME WAY!
 
 This work further enhances the **BETTER TOGETHER STORY!**, and additionally providing more options and choice for Automators and Infrastructure operators!
