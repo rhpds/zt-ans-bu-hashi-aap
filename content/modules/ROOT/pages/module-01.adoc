@@ -3,7 +3,7 @@
 = *Terraform Enterprise & Red Hat Ansible Automation Platform*
 image::main.png[]
 
-Welcome!!! 
+* Welcome to the `Terraform Enterprise & Red Hat Ansible Automation Platform` lab.
 
 Terraform (Enterprise and HCP Terraform) is a great tool you can use for deploying cloud infrastructure using delcarative Infrastructure as Code (IaC).
 It allows you to define infrastructure as code and then build, modify, and destroy these resources declaratively.
@@ -13,26 +13,22 @@ image::aaptfmain.png[]
 
 Estimated time to complete: _45 minutes_
 
-* Welcome to the `Terraform Enterprise & Red Hat Ansible Automation Platform` lab.
 In the following challenge tasks you will use Ansible Automation Platform and Terraform Enterprise together.
 Centrally from Ansible Automation Platform you will trigger an Ansible Workflow that will use Terraform to create cloud Infrastructure, and then synchronize the inventory back into Ansible Automation Platform, and go on to perform other configuration and orchestration tasks.
 
 * In this first challenge you will learn
 ** How to create an Ansible Workflow template and run it to create resources in AWS using Terraform Enterprise and Ansible Automation Platform will perform further configuration and orchestration tasks.
 
-There are `several prerequisites` that you will need to complete before you can start this lab. These are:
+There are `several prerequisites` that you will need to complete before you can start this lab.
 
-* Terraform Enterprise prerequisites
-* Ansible Automation Platform prerequisites
-
-The follwoing diagram shows the overall scenario that we will be covering in this lab section.
+The following diagram shows the overall scenario that we will be covering in this lab section.
 
 image::module1scenario.png[]
 
 [#task1]
 == Create the Terraform Enterprise API token
 
-This task is done in Terraform Enterprise. You will need to create an API token in Terraform Enterprise to use in Ansible Automation Platform to authenticate against Terraform Enterprise.
+You will need to create an API token in Terraform Enterprise to use in Ansible Automation Platform to authenticate against Terraform Enterprise.
 
 Login to Terraform Enterprise using the following *Login Credentials:*  
 
@@ -41,10 +37,6 @@ Login to Terraform Enterprise using the following *Login Credentials:*
 
 * Select the organization `rhdp-tf-org`.
 * In the left menu, click on `Settings` to expand the organzation settings options, and then click on `API Tokens`.
-
-
-To create the API token, you will need to navigate to the `Settings` menu in Terraform Enterprise.
-
 * Click on `API Tokens` and then click on `Create Token`.
 * select the `User Tokens` menu option, and then click on `account settings page` link.
 * Click on the `Create an API token` buttom.
@@ -74,7 +66,10 @@ image::tfetoken1.png[]
 This task is done in Terraform Enterprise.
 
 === Create the Terraform Enterprise Workspace
-Go back to the main menu. In the left menu, click on `Workspaces` and then click on `Create a workspace`.  Select `API-Driven Workflow` as the type of workspace.
+Go back to the main menu by clicking on the Terraform Enterprise logo in the top left corner. 
+
+* In the left menu, click on `Workspaces`
+* Click on `Create a workspace`.  Select `API-Driven Workflow` as the type of workspace.
 
 image::tfeworkspace.png[]
 
@@ -135,7 +130,7 @@ You can now use these keys to authenticate against the AWS cloud account.
 [#task3]
 ==  Create a Terraform Enterprise credential type.
 
-This task is done in Ansible Automation Platform.
+This task is done in Ansible Automation Platform.  Go back to the `MAIN LAB WINDOW`
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 
@@ -146,7 +141,8 @@ Log in using the following *Login Credentials:*
 
 An Ansible Credential Type defines a structure (schema) for storing and using secrets like passwords, SSH keys, or API tokens, allowing secure management within Ansible Automation Platform for connecting to systems in this example Terraform Enterprise.
 
-Expand: Automation Execution -> Credentials -> Credential Types -> + Create Credential Type
+Expand: Automation Execution -> Infrastructure -> Credentials -> Credential Types -> + Create Credential Type
+
 |===
 | Field | Value
 

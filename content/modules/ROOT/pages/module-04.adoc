@@ -16,7 +16,7 @@ In the previous challenge an Execution Environment called `Terraform Execution E
 **We feel it's important to understand how to create an Execution Environment, for this specific scenario.**
 NOTE: *You can skip this challenge if you are not interested in learning how to create an Execution Environment.*
 
-*To use HashiCorp Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise in YOUR Ansible Automation Platform environment you must create and Execution Environment* that includes the Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise collections, the Terraform binary, other cloud collections, and other dependencies.
+*To use HashiCorp Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise in YOUR Ansible Automation Platform environment you must create an Execution Environment* that includes the Terraform Enterprise (HCP Terraform) and HashiCorp Vault Enterprise collections, the Terraform binary, other cloud collections, and other dependencies.
 
 
 The tool needed to create an `execution environment` is called `ansible-builder`
