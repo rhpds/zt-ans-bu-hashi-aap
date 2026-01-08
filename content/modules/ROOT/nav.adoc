@@ -1,4 +1,4 @@
-* xref:module-01.adoc[Module-1. Terraform Enterprise & Red Hat Ansible Automation Platform]
+* xref:module-01.adoc[Module-1. Red Hat Ansible Automation Platform and HashiCorp Terraform Enterprise]
 ** xref:module-01.adoc#task1[Create the Terraform Enterprise API token]
 ** xref:module-01.adoc#task2[Create an Terraform Enterprise Workspace]
 ** xref:module-01.adoc#task3[Create a Terraform Enterprise credential type]
