@@ -1,5 +1,9 @@
 :doctype: book
 
+NOTE: To pop out the instructions in a new browser tab, you can click on the lab title at the top.
+
+image::instructions.png[]
+
 = *Red Hat Ansible Automation Platform and HashiCorp Terraform Enterprise*
 
 * Welcome to the `Terraform Enterprise & Red Hat Ansible Automation Platform` lab.
