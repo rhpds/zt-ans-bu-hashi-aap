@@ -4,11 +4,13 @@
 
 In this part we will continue the prerequisites and put the final touches on the Terraform Enterprise Workspace.
 
-The follwoing diagram shows the overall scenario that we started in the previous lab section.
+The following diagram shows the overall scenario that we started in the previous lab section.
 
 image::module2-3scenario.png[]
 
 Let's work through to completion of this scenario.
+
+NOTE:  **You MUST have a github account to complete this lab.**
 
 * Terraform Enterprise
 ** Import a GitHub repository to your account
