@@ -3,7 +3,7 @@ type: showroom
 tabs:
   - name: Ansible Automation Platform
     url: https://control-${guid}.${domain}/
-    external: true
+    external: false
   - name: Terraform Enterprise (TFE)
     url: https://tfe-https-${guid}.${domain}/session
     external: true
@@ -17,3 +17,6 @@ tabs:
     url: /wetty_vscode
   - name: Cloud (AWS)
     url: /cloud
+  - name: AAP-External
+    url: https://control-${guid}.${domain}/
+    external: true

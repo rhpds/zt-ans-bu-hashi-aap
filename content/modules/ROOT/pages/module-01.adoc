@@ -2,7 +2,7 @@
 
 NOTE: To pop out the instructions in a new browser tab, you can click on the lab title at the top.
 
-image::instructions.png[]
+image::instructions.png[link=self, window=blank, width=100%]
 
 = *Red Hat Ansible Automation Platform and HashiCorp Terraform Enterprise*
 
@@ -12,7 +12,7 @@ Terraform (Enterprise and HCP Terraform) is a great tool you can use for deployi
 It allows you to define infrastructure as code and then build, modify, and destroy these resources declaratively.
 Terraform (Enterprise and HCP Terraform) can be a simple way to deploy infrastructure, however if you add Ansible Automation Platform, together they can be used to automate the entire infrastructure lifecycle, from build to deploy, to manage, and to retire infrastructure, to enhance your automation journey!
 
-image::aaptfmain.png[]
+image::aaptfmain.png[link=self, window=blank, width=100%]
 
 In the following challenge tasks you will use Ansible Automation Platform and Terraform Enterprise together.
 Centrally from Ansible Automation Platform you will trigger an Ansible Workflow that will use Terraform to create cloud Infrastructure, and then synchronize the inventory back into Ansible Automation Platform, and go on to perform other configuration and orchestration tasks.
@@ -24,7 +24,7 @@ There are `several prerequisites` that you will need to complete before you can 
 
 The following diagram shows the overall scenario that we will be covering in this lab section.
 
-image::module1scenario.png[]
+image::module1scenario.png[link=self, window=blank, width=100%]
 
 [#task1]
 == Create the Terraform Enterprise API token
@@ -33,7 +33,7 @@ You will need to create an API token in Terraform Enterprise to use in Ansible A
 
 **This is the top menu of the lab. You can use this to pop out Ansible Automation Platform and Terraform Enterprise, and Vault Enterprise in new browser tabs.**
 
-image::labtopmenu.png[]
+image::labtopmenu.png[link=self, window=blank, width=100%]
 
 Login to Terraform Enterprise using the following *Login Credentials:*  
 
@@ -60,11 +60,11 @@ Login to Terraform Enterprise using the following *Login Credentials:*
 * Click on `Generate Token`, and then click on the `Copy to clipboard` button.
 * Copy the API token to your clipboard, save it somewhere where you can easily find it.
 
-image::tfetoken0.png[]
+image::tfetoken0.png[link=self, window=blank, width=100%]
 
-image::tfetoken.png[]
+image::tfetoken.png[link=self, window=blank, width=100%]
 
-image::tfetoken1.png[]
+image::tfetoken1.png[link=self, window=blank, width=100%]
 
 [#task2]
 == Create a Terraform Enterprise Workspace
@@ -78,9 +78,10 @@ Go back to the main menu by clicking on the `Terraform Enterprise logo` in the t
 * In the left menu, click on `Workspaces`
 * Click on `Create a workspace`.  Select `API-Driven Workflow` as the type of workspace.
 
-image::tfeworkspace.png[]
+image::tfeworkspace.png[link=self, window=blank, width=100%]
 
-Fill out the following fields:
+Fill out the following fields - **Table below:**
+
 |===
 | Field | Value
 
@@ -96,11 +97,11 @@ Fill out the following fields:
 
 Click on `Create` to save the workspace.
 
-image::tfeworkspace1.png[]
+image::tfeworkspace1.png[link=self, window=blank, width=100%]
 
 The workspace is now created. You can now use this workspace for Terraform Enterprise runs.
 
-image::tfeworkspace2.png[]
+image::tfeworkspace2.png[link=self, window=blank, width=100%]
 
 === Add the AWS Keys to the Terraform Enterprise Workspace
 
@@ -115,7 +116,7 @@ Enter the following details:
 * In the `Value` field enter the AWS Access Key ID. Get this from the `Cloud(AWS)` tab in your lab.
 * Click on `Add variable` to save the variable.
 
-image::tfevariables.png[]
+image::tfevariables.png[link=self, window=blank, width=100%]
 
 Repeat the process for the `AWS_SECRET_ACCESS_KEY` variable.
 
@@ -128,7 +129,7 @@ Enter the following details:
 * Select the `Sensitive` checkbox.
 * Click on `Add variable` to save the variable.
 
-image::tfevariables1.png[]
+image::tfevariables1.png[link=self, window=blank, width=100%]
 
 You have now added the AWS keys to the Terraform Enterprise Workspace.
 You can now use these keys to authenticate against the AWS cloud account.
@@ -147,7 +148,7 @@ Log in using the following *Login Credentials:*
 
 An Ansible Credential Type defines a structure (schema) for storing and using secrets like passwords, SSH keys, or API tokens, allowing secure management within Ansible Automation Platform for connecting to systems in this example Terraform Enterprise.
 
-Expand: Automation Execution -> Infrastructure -> Credentials -> Credential Types -> + Create Credential Type
+Expand: Automation Execution -> Infrastructure -> Credential Types -> + Create Credential Type
 
 |===
 | Field | Value
@@ -201,7 +202,7 @@ extra_vars:
 
 Click on `Create Credential Type` to save the credential type.
 
-image::tfecredtype.png[]
+image::tfecredtype.png[link=self, window=blank, width=100%]
 
 [#task4]
 == Create the Terraform Enterprise Credential in Ansible Automation Platform
@@ -238,7 +239,10 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 | Terraform Enterprise credential type
 
 | Terraform Enterprise Hostname
-| **<Your terraform hostname url>** # This will look like: https://tfe-https-12345-a.apps.#######.rhdp.net
+| tfe-https.{dns_domain}  **<Your terraform hostname url>** # This will look like: https://tfe-https-12345-a.apps.#######.rhdp.net
+
+| TEST TEST TESTExample
+| tfe-https-{guid}-1.{dns_domain}
 
 | Organization (**Terraform Organization**)
 | **rhdp-tf-org**
@@ -250,7 +254,7 @@ NOTE: The keys are encrypted so no one, not even an administrator, can see the k
 | <Your terraform api token> # This is the API token you generated earlier in Terraform Enterprise
 |===
 
-image::tfecred.png[]
+image::tfecred.png[link=self, window=blank, width=100%]
 
 [#task5]
 == Create a Terraform Inventory Source in Ansible Automation Platform
@@ -313,10 +317,12 @@ compose:
 
 * Scroll to the bottom Click the blue `Create source` button to **save** the Inventory Source.
 
-image::tfinventorysource0.png[]
-image::tfinventorysource.png[]
+image::tfinventorysource0.png[link=self, window=blank, width=100%]
+image::tfinventorysource.png[link=self, window=blank, width=100%]
 
 * Click on the `Sync inventory source` button in the top right corner of the screen to synchronize the inventory source. You should see a status of `Success` shortly.
+
+NOTE: This could take up to a minute as this is the first time we use the Execution Environment, and it needs to pull down the image from the registry.
 
 [#task6]
 == Create a Workflow Template to kick off a Terraform Enterprise `**PLAN and APPLY**` operation
@@ -331,10 +337,11 @@ NOTE: Please note that you can also do this in Azure and Google Cloud in the sam
 
 Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already) Expand the `Automation Execution` menu on the left.
-`Automation Execution` -> `Templates`.
-Now click on `+ Create job template`
 
-Fill out the following fields:
+`Automation Execution` -> `Templates` -> `+ Create job template`, then click on `Create job template`
+
+Fill out the following fields - **Table below:**
+
 |===
 | Field | Value
 
@@ -370,17 +377,16 @@ aws_instance_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAKzl1JGwZh92P1ABxI
 
 Scroll to the bottom Click the blue `Create  Job Template` button to **save** the job template.
 
-image::templateapply1.png[]
+image::templateapply1.png[link=self, window=blank, width=100%]
 
 === Create the `WF-Terraform Enterprise APPLY` workflow template, and it's nodes
 
 * Click on the `Ansible Automation Platform` tab at the top of lab.
 (if not already) Expand the `Automation Execution` menu on the left.
-`Automation Execution` -> `Templates` -> `Create Job Template`.
+`Automation Execution` -> `Templates` -> `+ Create template` -> then select `Create workflow job template`
 
-* Now click on `+ Create Workflow job template`
+Fill out the following fields - **Table below:**
 
-Fill out the following fields:
 |===
 | Field | Value
 
@@ -393,26 +399,26 @@ Fill out the following fields:
 
 Scroll to the bottom Click the blue `Create Workflow Job Template` button to **save** the Workflow.
 
-image::wftemplateapply1.png[]
+image::wftemplateapply1.png[link=self, window=blank, width=100%]
 
 === Create the nodes for the `WF-Terraform Enterprise APPLY` workflow template
 
 * Select `+ Add step` and then select the `Terraform Enterprise APPLY` job template you created earlier, Select `Next` to continue, and then `Finish` to save the node.
 
-image::wftemplateapply2.png[]
+image::wftemplateapply2.png[link=self, window=blank, width=100%]
 
-* Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
+* Click on the vertical ellipsis `...` at the end of the node we just created, and then select `+ Add step and link`.
 * For this next step change the `Node Type` to `Inventory Source Sync` and select the `AWS source for TFE resources`. Select `Next` then `Finish` to save this second step. This will synchronize the inventory source you created earlier.
 
-image::wftemplateapply3.png[]
+image::wftemplateapply3.png[link=self, window=blank, width=100%]
 
-* Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
+* Click on the vertical ellipsis `...` at the end of the node we just created, and then select `+ Add step and link`.
 * For this next step keep the `Node Type` to `Job Template` and select the `Install Nginx on RHEL` job template. Select `Next` then `Finish` to save this step.
 ** The `Install Nginx on RHEL` job template is a job template that is already created for you in Ansible Automation Platform. It is used to install Nginx on the RHEL hosts.
 
 Click on the `Save` button to save the workflow template.
 
-image::wftemplateapply4.png[]
+image::wftemplateapply4.png[link=self, window=blank, width=100%]
 
 === Launch the `WF-Terraform Enterprise APPLY` workflow template
 
@@ -420,34 +426,40 @@ Launch the `WF-Terraform Enterprise APPLY` workflow template by selecting it and
 
 * Observe the output of the Workflow Template run. You will see the nodes running and the workflow visualizer showing the flow of the workflow.
 
-image::wftemplateapply5.png[]
+image::wftemplateapply5.png[link=self, window=blank, width=100%]
 
 * Quickly switch to the `Terraform Enterprise` tab in your lab and observe the `plan` and then the `apply` being performed. 
+* If you were still at the Adding of an API Token screen, click on the `Terraform Enterprise` LOGO in the top left. Select the `rhdp-tf-org` organization, then select the `TFE-Demo` workspace, and then click on the `Runs` menu option on the left.
 * Click on the `Run` menu option on the left. You will see the `plan` and then the `apply` being performed. Also notice the resouce count in the Terraform Enterprise console.
 
 This showing that Ansible Automation Platform was able to trigger the Terraform Enterprise `plan` and `apply` operations successfully.
 
-image::tfeapply1.png[]
+image::tfeapply1.png[link=self, window=blank, width=100%]
 
 === Validate the Nginx installation
+
+**Please make sure that the Ansible Workflow completed successfully before proceeding. AAP has to have completed the `Install Nginx on RHEL` job template successfully before proceeding to validate the Nginx installation.**
 
 * From the Terraform Enterprise console, in the job run output you will see the resources that were created by Terraform.
 * From here get the public IP address (or DNS name) of the EC2 instance that was created by Terraform. 
 * You can also get the public IP address from the Ansible Automation Platform -> Inventory -> Terraform Inventory -> Hosts. Click on the host and then click on the `Details` tab.
 
-image::tfeapplyip.png[]
+image::tfeapplyip.png[link=self, window=blank, width=100%]
 
 * Open a browser tab and navigate to the public IP address of the EC2 instance that was created by Terraform.
-* Use `http` as the protocol. You will see the following page:
+* Use `http` as the protocol.
+* If prompted that the site doesn't support a secuure connection, please click on the `Continue to site` button. 
 
-image::rhelnginx.png[]
+You will see the following page:
+
+image::rhelnginx.png[link=self, window=blank, width=100%]
 
 === Inspect the Terraform Inventory in Ansible Automation Platform
 
 * Switch back to the Ansible Automation Platform browser tab. 
 * Select the `Terraform Inventory`, and then click on the `Hosts` menu. Notice that there is a new host that was created by Terraform and is now part of your Ansible inventory, and hence can be used for further automation operations.
 
-image::tfeapplyinventory.png[]
+image::tfeapplyinventory.png[link=self, window=blank, width=100%]
 
 [#task7]
 == Create the `WF-Terraform Enterprise DESTROY` workflow template, and its nodes
@@ -465,7 +477,7 @@ Start by creating the another job template to trigger a `Terraform Entperprise d
 * Expand the `Automation Execution` menu on the left. `Automation Execution` -> `Templates`.
 * Now click on `+ Create Template` then click  `Create job template`
 
-Fill out the following fields:
+Fill out the following fields - **Table below:**
 
 |===
 | Field | Value
@@ -500,7 +512,7 @@ Scroll to the bottom Click the blue `Create Job Template` button to **save** the
 * `Automation Execution` -> `Templates` -> `+Create template`.
 * Now click on `+ Create Workflow job template`
 
-Fill out the following fields:
+Fill out the following fields - **Table below:**
 |===
 | Field | Value
 
@@ -517,7 +529,7 @@ Scroll to the bottom Click the blue `Create Workflow Job Template` button to **s
 
 * Select `+ Add step` and then select the `Terraform Enterprise DESTROY` job template you created earlier, Select `Next` to continue, and then `Finish` to save the node.
 
-* Click on the elipsis `...` at the end of the node, and then select `+ Add step and link`.
+* Click on the vertical ellipsis `...` at the end of the node we just created, and then select `+ Add step and link`.
 * For this next step change the `Node Type` to `Inventory Source Sync` and select the `AWS source for TFE resources`. Select `Next` then `Finish` to save this second step.
 
 Click on the `Save` button to save the workflow template.
@@ -530,7 +542,7 @@ Launch the `Terraform Enterprise DESTROY Workflow` template by selecting it and 
 
 * Quickly switch to the `Terraform Enterprise` tab in your lab and observe the `destroy` being performed. Also notice the resouce count in the Terraform Enterprise console. You will see the resource count should be 0.
 
-image::tfedestroy1.png[]
+image::tfedestroy1.png[link=self, window=blank, width=100%]
 
 * Observe the resources that were destroyed by Terraform in Ansible Automation Platform -> Inventory -> Terraform Inventory -> Hosts.
 ** Here you will see that the host has been removed from the inventory and the resources have been destroyed.
