@@ -6,7 +6,7 @@ In this part we will continue the prerequisites and put the final touches on the
 
 The following diagram shows the overall scenario that we started in the previous lab section.
 
-image::module2-3scenario.png[]
+image::module2-3scenario.png[link=self, window=blank, width=100%]
 
 Let's work through to completion of this scenario.
 
@@ -29,7 +29,7 @@ The following repository contains the Terraform code for the infrastructure you 
 * https://github.com/ansible-tmm/aap-hashi-lab-2.git  # This is the repository you will be importing to your account
 * While logged in to Github.com with your acccount, the top right corner click on the `+` icon, and select `Import repository`
 
-image::importrepo.png[]
+image::importrepo.png[link=self, window=blank, width=100%]
 
 * In the `Repository URL` field, enter the URL of the repository you want to import, in this case: https://github.com/ansible-tmm/aap-hashi-lab-2.git
 * Scroll down and enter a `Repository name` for your new repository, in this case: `aap-hashi-lab-2` (or another name if you prefer)
@@ -48,11 +48,11 @@ Back in the Terraform Enterprise UI, click on the `Workspaces` menu option in th
 * Enter the following details:
 * For the `Project` field, select `rhdp-initial-project` from the dropdown, and select `Create`
 
-image::workspace1.png[]
+image::workspace1.png[link=self, window=blank, width=100%]
 
 * On the next screen choose `Version Control Workflow` for the Workspace type
 
-image::workspace2.png[]
+image::workspace2.png[link=self, window=blank, width=100%]
 
 Now you will need to configure the Workspace to use the GitHub repository you cloned earlier into your GitHub account.
 
@@ -61,19 +61,19 @@ Now you will need to configure the Workspace to use the GitHub repository you cl
 * You will now be launced to step 2 (`Set up provider`), which is to setup the GitHub repository connection
 * Click the `Register a new OAuth Application` link to register a new OAuth application with GitHub.
 
-image::workspace3.png[]
+image::workspace3.png[link=self, window=blank, width=100%]
 
 * Authenticate to `your GitHub account`, and authorize the Terraform Enterprise OAuth application to access your GitHub account.
 * **It will have automatically populated some of the fields for you as they relate to Terraform Enterprise**
 * Scroll down and click on the `Register application` button
 
-image::workspace4.png[]
+image::workspace4.png[link=self, window=blank, width=100%]
 
 * The applciation will now be registered, and you will need to click the `Generate a new client secret` button to generate a new client secret. 
 * You will be prompted to login to your GitHub account, please do so.
 * Copy both the `Client ID` and `Client Secret`, you will need these momentarily.
 
-image::workspace5.png[]
+image::workspace5.png[link=self, window=blank, width=100%]
 
 BACK in the `Terraform Enterprise UI`, please do the following:
 
@@ -82,13 +82,13 @@ BACK in the `Terraform Enterprise UI`, please do the following:
 * Paset the `Client Secret` to the Client Secret field.
 * Click on the `Connect and Continue` button to save the VCS provider configuration
 
-image::workspace6.png[]
+image::workspace6.png[link=self, window=blank, width=100%]
 
 * You will be redirected to GitHub.com to authorize the Terraform Enterprise application to access your GitHub account, please `authenticate and authorize`.
 * Scroll to the bottom of the screen and click on the `Skip and Finish` button
 * On the next screen, you will need to choose the repository you want to use for this workspace. For this lab, we will ***use the repository you imported earlier into your GitHub account** We had named it `aap-hashi-lab-2` earlier (Unless you chose to name it something else).
 
-image::workspace6-1.png[]
+image::workspace6-1.png[link=self, window=blank, width=100%]
 
 * The Workspace Name will default ot the repository name. Change the `Workspace Name` to `TFE-Demo-VCS`
 * For the `Description` field, enter `Using GitHub commits to trigger Plan/Apply Runs`
@@ -113,7 +113,7 @@ image::workspace6-1.png[]
 
 * Scroll down the bottom of the screen and click on the `Create` button to save the workspace configuration
 
-image::workspace7.png[]
+image::workspace7.png[link=self, window=blank, width=100%]
 
 * Scroll down the bottom of the screen and click on the `Create` button to save the workspace configuration
 
@@ -127,18 +127,18 @@ While you still have the GitHub UI open, navigate to the repository you cloned e
 * Scroll down and click on the `Update Webhook` button to save the webhook configuration
 * Authenticate to your GitHub account if prompted
 
-image::workspace8.png[]
+image::workspace8.png[link=self, window=blank, width=100%]
 
 * You will now see that the Terraform Enterprise Workspace is now created successfully.
 * Don't accept the auto detected variables, and click on `Go to Workspace Overview`
 
-image::workspace9.png[]
+image::workspace9.png[link=self, window=blank, width=100%]
 
 * Don't accept the auto detected variables, and click on `Go to Workspace Overview`
 * Click on the `Go to Workspace Overview` link to navigate to the workspace dashboard
 * On this page, click on the `Configure Variables` button
 
-image::workspace10.png[]
+image::workspace10.png[link=self, window=blank, width=100%]
 
 * On the next screen, add the following `Terraform variables`:
 
@@ -178,7 +178,7 @@ image::workspace10.png[]
 | Yes
 |===
 
-image::workspacevars1.png[]
+image::workspacevars1.png[link=self, window=blank, width=100%]
 
 
 
@@ -194,11 +194,11 @@ Let's perform a quick test to make sure we set up the Terraform Enterprise Works
 * Click on the `+ New Run` button in the top right of the Workspace overview screen.
 * Click on the `Start` button to perform a quick test run of the Terraform code in the Terraform Enterprise Workspace.
 
-image::testplanonly2.png[]
+image::testplanonly2.png[link=self, window=blank, width=100%]
 
 * You will see the plan run completed successfully.
 
-image::testplanonly3.png[]
+image::testplanonly3.png[link=self, window=blank, width=100%]
 
 **GREAT! We are all set to commit changes to the Terraform code in the GitHub repository to trigger the infrastructure provisioning and automation.**
 
@@ -210,17 +210,17 @@ image::testplanonly3.png[]
 * Chance the `instance_count = 0` to `instance_count = 2`
 * Click on the `Commit changes` button to commit the changes to the repository, then click `Commit` directly to the main branch
 
-image::gitcommit1.png[]
+image::gitcommit1.png[link=self, window=blank, width=100%]
 
 === What will happen now in Terraform Enterprise
 
 * Below you will see the plan and apply in Terraform Enterprise, and the resources that will be created.
 
-image::planapply1.png[]
+image::planapply1.png[link=self, window=blank, width=100%]
 
 * Please observe the output of the plan and apply.
 
-image::planapply2.png[]
+image::planapply2.png[link=self, window=blank, width=100%]
 
 * **Terraform Enterprise created the SSH Keys for the RHEL ec2 instances in the Vault Enterprise secret engine.**
 
@@ -232,22 +232,22 @@ If you'd like to see the SSH private key that was created, you can navigate to t
 * Click on the `Secret` menu item.
 * You will see the SSH private key.
 
-image::vaultsshkey.png[]
+image::vaultsshkey.png[link=self, window=blank, width=100%]
 
 === What will happen now in Ansible Automation Platform
 
 * Terraform Enterprise will then trigger the `WF-Launched by TFE` workflow template in Ansible Automation Platform. You will see the workflow in a `Running` state.
 
-image::tfewf0.png[]
+image::tfewf0.png[link=self, window=blank, width=100%]
 
 * After a few minutes, you will see the workflow template successfully completed.
 
-image::tfewf1.png[]
+image::tfewf1.png[link=self, window=blank, width=100%]
 
 * If you look at the job template output, you will see the Nginx installation completed successfully on all the new EC2 instances.
 * **Ansible Automation Platform retrieved the SSH private key for the RHEL ec2 instances, from Vault Enterprise, to allow Ansible to connect to the instances and install Nginx.**
 
-image::tfewf2.png[]
+image::tfewf2.png[link=self, window=blank, width=100%]
 
 * The Terraform Inventory in Ansible Automation Platform will be synchronized with the new resources.
 * The RHEL ec2 instances will have Nginx installed and running on them.
@@ -259,4 +259,4 @@ The following scenario is what you competed in module 2 and module 3 of this lab
 * You learned how to trigger infrastructure provisioning and automation from Terraform Enterprise using GitHub commits.
 * You also learned how to configure Ansible Automation Platform to retrieve secrets from HashiCorp Vault Enterprise. AAP retrieved the SSH private key for the RHEL ec2 instances, from Vault Enterprise, to allow Ansible to connect to the instances and install Nginx.
 
-image::module2-3scenario.png[]
+image::module2-3scenario.png[link=self, window=blank, width=100%]

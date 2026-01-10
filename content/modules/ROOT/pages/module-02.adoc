@@ -6,7 +6,7 @@ In this challenge you will learn how to trigger infrastructure provisioning and 
 
 The follwoing diagram shows the overall scenario that we will be covering in this, and the following lab sections. Let's work through to completion of this scenario.
 
-image::module2-3scenario.png[]
+image::module2-3scenario.png[link=self, window=blank, width=100%]
 
 There are a number of prerequisites that you will need to complete before you can start this lab.
 
@@ -28,17 +28,17 @@ Enter the following details to login to the Vault Enterprise UI.
 * `Password:  ansible123!`
 * Click on the `Sign In` button.
 
-image::vaultlogin.png[]
+image::vaultlogin.png[link=self, window=blank, width=100%]
 
 * Click on the `Vault` menu option in the left menu.
 * Click on the `Secrets Engines` menu option.
 * Click on the `+ Enable new engine` button.
 
-image::vaultengine1.png[]
+image::vaultengine1.png[link=self, window=blank, width=100%]
 
 * Select the `KV` secrets engine from the `Generic` section.
 
-image::vaultkv.png[]
+image::vaultkv.png[link=self, window=blank, width=100%]
 
 Enter the following details:
 
@@ -56,7 +56,7 @@ Enter the following details:
 * Scroll down and in the `Version` dropdown, select `2`. (This is the latest version of the KV secrets engine.) Must be 2.
 * Scroll down and click on the `Enable Engine` button.
 
-image::vaultengine2.png[]
+image::vaultengine2.png[link=self, window=blank, width=100%]
 
 === Create a new secret for your AWS keys in this secret engine
 
@@ -77,7 +77,7 @@ image::vaultengine2.png[]
 
 * Click on the `Save` button.
 
-image::vaultawscreds.png[]
+image::vaultawscreds.png[link=self, window=blank, width=100%]
 
 You have now created a new secret for your AWS keys in the Vault secret engine. You can now use these keys to authenticate against the AWS cloud account.
 
@@ -123,7 +123,7 @@ OR (alternate way to read the secret)
 vault kv get -mount=secret aws_creds
 ----
 
-image::vaultawscreds2.png[]
+image::vaultawscreds2.png[link=self, window=blank, width=100%]
 
 You should see the AWS Access Key ID and AWS Secret Access Key in the output.
 
@@ -177,7 +177,7 @@ path "secret/data/*/metadata" {
 
 * Click on the `Create policy` button.
 
-image::terraformpolicy.png[]
+image::terraformpolicy.png[link=self, window=blank, width=100%]
 
 You have now created a new policy in Vault Enterprise.
 
@@ -189,16 +189,16 @@ Now let's enable the `AppRole authentication method` in Vault Enterprise UI. The
 * Click on the `+ Enable new method +` button on the right.
 * Click on the `AppRole` tile.
 
-image::approle1.png[]
+image::approle1.png[link=self, window=blank, width=100%]
 
 * In the `Path` field, keep it at the default of `approle`
 * Click on `Enable method` to enable the AppRole authentication method
 
-image::approle2.png[]
+image::approle2.png[link=self, window=blank, width=100%]
 
 NOTE: The Vault UI only supports the configuration of the AppRole authentication method. You will need to use the Vault CLI to create the Application Role, and perform additional configuration steps.
 
-image::approle3.png[]
+image::approle3.png[link=self, window=blank, width=100%]
 
 * Open the `TERMINAL` tab from your lab
 * You will be at the `vscode` terminal prompt
@@ -257,7 +257,7 @@ vault write auth/approle/login \
     secret_id=<aapterraform-secret-id>
 ----
 
-image::approle4.png[]
+image::approle4.png[link=self, window=blank, width=100%]
 
 You have now created an Application Role (AppRole) in Vault Enterprise. Ansible Automation Platform and Terraform Enterprise can now authenticate securely against the Vault secret engine.
 
@@ -302,9 +302,9 @@ Create a new credential in Ansible Automation Platform to use the AppRole authen
 | v2
 |===
 
-image::aapvaultlookupcred1.png[]
+image::aapvaultlookupcred1.png[link=self, window=blank, width=100%]
 
-image::aapvaultlookupcred2.png[]
+image::aapvaultlookupcred2.png[link=self, window=blank, width=100%]
 
 * Click on the `Create credential` button.
 
@@ -328,11 +328,11 @@ image::aapvaultlookupcred2.png[]
 | access_key
 |===
 
-image::aapvaultlookupcred3.png[]
+image::aapvaultlookupcred3.png[link=self, window=blank, width=100%]
 
 * Click on the `Run` button to test credential lookup. You should see a success message in the output.
 
-image::aapvaultlookupcred4.png[]
+image::aapvaultlookupcred4.png[link=self, window=blank, width=100%]
 
 You have now configured Ansible Automation Platform to use the AppRole authentication method to authenticate against the Vault secret engine.
 
@@ -365,7 +365,7 @@ You have now configured Ansible Automation Platform to use the AppRole authentic
 | **Click on the `KEY` icon to the right of the `SSH Private Key` field**
 |===
 
-image::aapvaultsshcred1.png[]
+image::aapvaultsshcred1.png[link=self, window=blank, width=100%]
 
 
 * On the `Secret Management System` dialig box, fill in the following details:
@@ -395,7 +395,7 @@ image::aapvaultsshcred1.png[]
 | private_key
 |===
 
-image::aapvaultsshcred2.png[]
+image::aapvaultsshcred2.png[link=self, window=blank, width=100%]
 
 * Click on the `Create credential` button. You will see a summary of the credential you just created
 
@@ -429,7 +429,7 @@ Click on the `Ansible Automation Platform` tab at the top of lab. (if not alread
 
 * Click on the `Save job template` button to save the job template
 
-image::updatedjt.png[]
+image::updatedjt.png[link=self, window=blank, width=100%]
 
 === Create a new `Worflow Job Template`
 
@@ -450,7 +450,7 @@ image::updatedjt.png[]
 
 * Click on the `Create workflow job template` button to save the workflow job template
 
-image::newwjt.png[]
+image::newwjt.png[link=self, window=blank, width=100%]
 
 NOTE: `Prompt on launch` is needed because Terraform Enterprise cannot supply or override Ansible job template variables unless Ansible Automation Platform explicitly allows it. Without `Prompt on launch`, Ansible Automation Platform treats the job template as fully static, and external systems (like Terraform Enterprise) are blocked from injecting runtime values.
 
@@ -461,6 +461,6 @@ NOTE: `Prompt on launch` is needed because Terraform Enterprise cannot supply or
 * For this next step change the `Node Type` to `Job Template` and select the `**Install Nginx on RHEL - TFE-VCS**` job template you created earlier. Select `Next` then `Finish` to save this second step.
 * Click on the `Save` button to save the workflow template.
 
-image::newwjt2.png[]
+image::newwjt2.png[link=self, window=blank, width=100%]
 
 Now we're **ALMOST SET** to trigger the infrastructure provisioning and automation from Terraform Enterprise, in the next lab section.
