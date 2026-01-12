@@ -78,6 +78,7 @@ image::workspace4.png[link=self, window=blank, width=100%]
 * The applciation will now be registered, and you will need to click the `Generate a new client secret` button to generate a new client secret. 
 * You will be prompted to login to your GitHub account, please do so.
 * Copy both the `Client ID` and `Client Secret`, you will need these momentarily.
+* Scroll down and click on `Update application` button to save the application configuration
 
 image::workspace5.png[link=self, window=blank, width=100%]
 
@@ -92,6 +93,9 @@ image::workspace6.png[link=self, window=blank, width=100%]
 
 * You will be redirected to GitHub.com to authorize the Terraform Enterprise application to access your GitHub account, please `authenticate and authorize`.
 * Scroll to the bottom of the screen and click on the `Skip and Finish` button
+
+image::workspace6-0.png[link=self, window=blank, width=100%]
+
 * On the next screen, you will need to choose the repository you want to use for this workspace. For this lab, we will ***use the repository you imported earlier into your GitHub account** We had named it `aap-hashi-lab-2` earlier (Unless you chose to name it something else).
 
 image::workspace6-1.png[link=self, window=blank, width=100%]
