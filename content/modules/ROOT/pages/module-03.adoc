@@ -275,6 +275,26 @@ You will see the following page:
 
 image::rhelnginx.png[link=self, window=blank, width=100%]
 
+=== Destroy the infrastructure - Please
+
+In this section we will destroy the infrastructure that was created by Terraform Enterprise in the `TFE-Demo-VCS` workspace.
+
+* Navigate to the Terraform Enterprise UI, and click on the `Workspaces` menu option on the left.
+* Select the `TFE-Demo-VCS` workspace.
+* Click on the `Settings` menu option on the left.
+* Click on the `Destruction and Deletion` menu option on the left.
+* Scoll down to the `Manually Destroy` section.
+* Click on the `Queue Destroy Plan` button.
+* Another dialog box will appear
+** Enter/paste the name of the Workspace to confirm the destruction: `TFE-Demo-VCS`.
+** Click on the `Queue Destroy Plan` button.
+This will trigger a destroy plan run of the Terraform code in the Terraform Enterprise Workspace, and will take a few minutes to complete.
+
+image::destroy0.png[link=self, window=blank, width=100%]
+
+image::destroy1.png[link=self, window=blank, width=100%]
+
+**THANK YOU FOR CLEANING UP THE INFRASTRUCTURE! APPRECIATED!**
 
 == Summary
 The following scenario is what you competed in module 2 and module 3 of this lab. 
@@ -283,3 +303,5 @@ The following scenario is what you competed in module 2 and module 3 of this lab
 * You also learned how to configure Ansible Automation Platform to retrieve secrets from HashiCorp Vault Enterprise. AAP retrieved the SSH private key for the RHEL ec2 instances, from Vault Enterprise, to allow Ansible to connect to the instances and install Nginx.
 
 image::module2-3scenario.png[link=self, window=blank, width=100%]
+
+**THANK YOU FOR COMPLETING THE LAB! GREAT JOB!**
