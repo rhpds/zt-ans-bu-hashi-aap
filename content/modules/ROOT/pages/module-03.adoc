@@ -199,11 +199,11 @@ Now we're all set to trigger the infrastructure provisioning and automation from
 
 === Perform a quick test run in the Terraform Enterprise Workspace
 
-Let's perform a quick test to make sure we set up the Terraform Enterprise Workspace correctly.  This will be a `Plan only` run, so we will not actually create any resources.
+Let's perform a quick test to make sure we set up the Terraform Enterprise Workspace correctly. This will be a `Plan only` run, so we will not actually create any resources.
 
 * Click on the `Runs` menu option on the left.
-* For the `Run Type` select `Plan only`
 * Click on the `+ New Run` button in the top right of the Workspace overview screen.
+* For the `Run Type` select `Plan only`
 * Click on the `Start` button to perform a quick test run of the Terraform code in the Terraform Enterprise Workspace.
 
 image::testplanonly2.png[link=self, window=blank, width=100%]

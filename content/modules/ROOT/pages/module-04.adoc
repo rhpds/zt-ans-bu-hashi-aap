@@ -108,6 +108,9 @@ This file defines the Ansible content collections you want to include in your ex
 . Include the cloud collections `amazon.aws`, `cloud.terraform`, `google.cloud`, and `azure.azcollection` collections. I include these to allow Terraform Enterprise (and HCP Terraform) to spin up  cloud infrastructure on AWS, Azure and GCP.
 . Most importantly, we are including the `hashicorp.terraform` and `hashicorp.vault` collections. These will allow you from Ansible Automation Platform to trigger Terraform Enterprise (and HCP Terraform) and HashiCorp Vault Enterprise operations.
 . If additional collections are desired, you would include them in the `requirements.yml` file as well
+. The `cloud.terraform` collection is for community Terraform. While it can be made to work with Terraform Enterprise (and HCP Terraform), but that is what the `hashicorp.terraform` collection is for.
+.. `hashicorp.terraform:` Automation of Terraform Enterprise (and HCP Terraform) operations using API calls. No Terraform binary is needed.
+.. `cloud.terraform:` Requires the Terraform binary to be installed in the execution environment or on a dedicated Terraform Host
 
 
 [#task5]
