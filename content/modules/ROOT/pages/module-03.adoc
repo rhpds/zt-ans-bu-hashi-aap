@@ -99,7 +99,7 @@ image::workspace6-0.png[link=self, window=blank, width=100%]
 
 image::workspace6-1.png[link=self, window=blank, width=100%]
 
-* The Workspace Name will default ot the repository name. Change the `Workspace Name` to `TFE-Demo-VCS`
+* The Workspace Name will default to the repository name. Change the `Workspace Name` to `TFE-Demo-VCS`
 * For the `Description` field, enter `Using GitHub commits to trigger Plan/Apply Runs`
 * Expand the `*Advanced Options*` section, and check both of the `*Auto-apply*` option checkboxes. This will automatically apply the changes to the workspace when you commit changes to the repository.
 * For the `Terraform Working Directory` field, enter `TF_templates/AWS/`

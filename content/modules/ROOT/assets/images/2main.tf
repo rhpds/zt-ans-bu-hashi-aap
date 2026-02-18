@@ -1,6 +1,6 @@
 # main.tf
 provider "aws" {
-  region     = "us-east-1"
+  region     = "us-east-2"
 }
 resource "aws_vpc" "this" {
   cidr_block = "10.20.20.0/25"
@@ -11,12 +11,12 @@ resource "aws_vpc" "this" {
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "10.20.20.0/26"
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-2a"
 }
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "10.20.20.64/26"
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-2a"
 }
 resource "aws_route_table" "this-rt" {
   vpc_id = aws_vpc.this.id
