@@ -371,7 +371,7 @@ ADD the following to the `Extra variables` section
 ---
 aws_region: us-east-2
 aws_name_tag: tfevm
-aws_instance_size: t2.medium
+aws_instance_size: t2.micro
 aws_instance_count: 1
 aws_instance_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAKzl1JGwZh92P1ABxIVHE52I2nJk+h7ED4B6GgbMXAl hmourad@hmourad-mac
 ----
