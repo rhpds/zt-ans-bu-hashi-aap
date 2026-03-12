@@ -182,7 +182,7 @@ virtualmachines:
         - echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/50-cloud-init.conf
         - systemctl reload sshd
   - name: terraform
-    image: tfe-rhel-image-1
+    image: tfe-rhel-image-2
     memory: 16G
     cores: 4
     image_size: 120Gi
