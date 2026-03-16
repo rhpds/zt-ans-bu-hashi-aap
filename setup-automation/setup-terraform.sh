@@ -40,7 +40,7 @@ spec:
       value: "terraform-enterprise_terraform-enterprise-cache"
     - name: "TFE_ENCRYPTION_PASSWORD"
       value: 'tfeseed'
-    image: "images.releases.hashicorp.com/hashicorp/terraform-enterprise:1.0.2"
+    image: "images.releases.hashicorp.com/hashicorp/terraform-enterprise:1.2.0"
     name: "terraform-enterprise"
     imagePullPolicy: "IfNotPresent"
     ports:
