@@ -64,6 +64,9 @@
       dest: "/tmp/runtime-scripts/{{ module_dir }}/{{ module_stage }}-{{ ansible_host }}.sh"
     register: r_result
 
+  - name: Include secrets var
+    ansible.builtin.include_vars: ../config/secrets.yaml
+
   - name: Execute module_stage-host.sh if it exists
     when: r_script_test.stat.exists
     ansible.builtin.shell: "sh -x /tmp/runtime-scripts/{{ module_dir }}/{{ module_stage }}-{{ ansible_host }}.sh > /tmp/runtime-scripts/{{ module_dir }}/{{ module_stage }}-{{ ansible_host }}.log 2>&1"
@@ -75,7 +78,7 @@
       AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
       AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
       AWS_DEFAULT_REGION: "{{ aws_default_region }}"
-      TFE_TOKEN: "{{ tfe_api_token }}"
+      TFE_TOKEN: "{{ tfe_token }}"
 
   - name: Output script result
     ansible.builtin.debug:
