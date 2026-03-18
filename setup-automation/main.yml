@@ -91,6 +91,7 @@
       SSH_KEY: "{{ ssh_key }}"
       VAULT_LIC: "{{ vaultlic }}"
       TFE_LIC: "{{ tfelic }}"
+      TFE_API_TOKEN: "{{ tfe_api_token }}"
 
   - name: Output script result
     ansible.builtin.debug:
