@@ -23,84 +23,12 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
     tfe_project_name: rhdp-initial-project
+    tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') }}"
 
   tasks:
 
     # ===================================================================
-    # Task 1: Create TFE API Token
-    # ===================================================================
-
-    - name: Check for stored TFE API token
-      ansible.builtin.stat:
-        path: /tmp/tfe-api-token.txt
-      register: tfe_token_file
-
-    - name: Read stored TFE API token
-      ansible.builtin.slurp:
-        src: /tmp/tfe-api-token.txt
-      register: tfe_token_slurp
-      when: tfe_token_file.stat.exists
-
-    - name: Set TFE token from stored file
-      ansible.builtin.set_fact:
-        tfe_api_token: "{{ (tfe_token_slurp.content | b64decode).strip() }}"
-      when: tfe_token_file.stat.exists
-
-    - name: Validate stored TFE token
-      ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/account/details"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ tfe_api_token }}"
-          Content-Type: "application/vnd.api+json"
-        validate_certs: false
-        status_code: [200, 401, 403]
-      register: tfe_token_check
-      when: tfe_api_token is defined and tfe_api_token | length > 0
-
-    - name: Clear invalid stored token
-      ansible.builtin.set_fact:
-        tfe_api_token: ""
-      when:
-        - tfe_token_check is defined
-        - tfe_token_check.status | default(401) != 200
-
-    - name: Create TFE API token via IACT
-      when: tfe_api_token is not defined or tfe_api_token | length == 0
-      block:
-        - name: Retrieve IACT from TFE
-          ansible.builtin.uri:
-            url: "{{ tfe_internal }}/admin/retrieve-iact"
-            method: GET
-            validate_certs: false
-            return_content: true
-          register: iact_result
-          retries: 5
-          delay: 10
-          until: iact_result is success
-
-        - name: Create admin API token using IACT
-          ansible.builtin.uri:
-            url: "{{ tfe_internal }}/api/v2/admin/initial-admin-token?token={{ iact_result.content | trim }}"
-            method: POST
-            headers:
-              Content-Type: "application/vnd.api+json"
-            validate_certs: false
-            status_code: [200, 201]
-          register: admin_token_result
-
-        - name: Set TFE API token
-          ansible.builtin.set_fact:
-            tfe_api_token: "{{ admin_token_result.json.token }}"
-
-        - name: Store TFE API token for reuse
-          ansible.builtin.copy:
-            content: "{{ tfe_api_token }}"
-            dest: /tmp/tfe-api-token.txt
-            mode: '0600'
-
-    # ===================================================================
-    # Task 2: Create TFE Workspace + AWS Variables
+    # Task 1: Create TFE Workspace + AWS Variables
     # ===================================================================
 
     - name: Get TFE projects
@@ -216,7 +144,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         | list | length == 0
 
     # ===================================================================
-    # Task 3: Create Terraform Enterprise Credential Type in AAP
+    # Task 2: Create Terraform Enterprise Credential Type in AAP
     # ===================================================================
 
     - name: Create Terraform Enterprise credential type
@@ -257,7 +185,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: "{{ aap_validate_certs }}"
 
     # ===================================================================
-    # Task 4: Create Terraform Enterprise Credential in AAP
+    # Task 3: Create Terraform Enterprise Credential in AAP
     # ===================================================================
 
     - name: Create Terraform Enterprise credential
@@ -276,7 +204,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: "{{ aap_validate_certs }}"
 
     # ===================================================================
-    # Task 5: Create Terraform Inventory Source in AAP
+    # Task 4: Create Terraform Inventory Source in AAP
     # ===================================================================
 
     - name: Create Terraform Inventory Source
@@ -313,7 +241,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: "{{ aap_validate_certs }}"
 
     # ===================================================================
-    # Task 6: Create APPLY Job Template + Workflow, then Launch
+    # Task 5: Create APPLY Job Template + Workflow, then Launch
     # ===================================================================
 
     - name: Create Terraform Enterprise APPLY job template
@@ -389,7 +317,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: "{{ aap_validate_certs }}"
 
     # ===================================================================
-    # Task 7: Create DESTROY Job Template + Workflow, then Launch
+    # Task 6: Create DESTROY Job Template + Workflow, then Launch
     # ===================================================================
 
     - name: Create Terraform Enterprise DESTROY job template
