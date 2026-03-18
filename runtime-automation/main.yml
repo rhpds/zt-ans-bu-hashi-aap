@@ -35,6 +35,7 @@
     aws_access_key: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID') | default('AWS_ACCESS_KEY_ID_NOT_FOUND', true) }}"
     aws_secret_key: "{{ lookup('ansible.builtin.env', 'AWS_SECRET_ACCESS_KEY') | default('AWS_SECRET_ACCESS_KEY_NOT_FOUND', true) }}"
     aws_default_region: "{{ lookup('ansible.builtin.env', 'AWS_DEFAULT_REGION') | default('us-east-2', true) }}"
+    tfe_api_token: "{{ lookup('ansible.builtin.env', 'TFE_TOKEN') | default('TFE_TOKEN_NOT_FOUND', true) }}"
   tasks:
   - name: Simple debug task
     ansible.builtin.debug:
@@ -74,6 +75,7 @@
       AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
       AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
       AWS_DEFAULT_REGION: "{{ aws_default_region }}"
+      TFE_TOKEN: "{{ tfe_api_token }}"
 
   - name: Output script result
     ansible.builtin.debug:
