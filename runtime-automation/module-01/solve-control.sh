@@ -60,6 +60,9 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
       ansible.builtin.uri:
         url: "{{ tfe_internal }}/api/v2/organizations/{{ tfe_org }}/workspaces"
         method: POST
+        headers:
+          Authorization: "Bearer {{ tfe_api_token }}"
+          Content-Type: "application/vnd.api+json"
         body_format: json
         body:
           data:
@@ -67,14 +70,12 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
             attributes:
               name: "{{ tfe_workspace_name }}"
               description: "My Initial Workspace for my first TFE demo."
+              execution-mode: remote
             relationships:
               project:
                 data:
                   type: projects
                   id: "{{ tfe_project_id }}"
-        headers:
-          Authorization: "Bearer {{ tfe_api_token }}"
-          Content-Type: "application/vnd.api+json"
         validate_certs: false
         status_code: [200, 201]
       register: tfe_ws_create
