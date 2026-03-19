@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
+cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
 ---
 - name: Solve Module 01 - AAP + Terraform Enterprise
   hosts: localhost
@@ -383,4 +383,4 @@ ENDOFPLAY
 
 export ANSIBLE_LOCALHOST_WARNING=False
 export ANSIBLE_INVENTORY_UNPARSED_WARNING=False
-ANSIBLE_COLLECTIONS_PATH=/root/ansible-automation-platform-containerized-setup/collections/ansible_collections/ /usr/bin/ansible-playbook /tmp/setup-scripts/solve_module_01.yml
+ANSIBLE_COLLECTIONS_PATH=/root/ansible-automation-platform-containerized-setup/collections/ansible_collections/ /usr/bin/ansible-playbook /tmp/runtime-scripts/solve_module_01.yml
