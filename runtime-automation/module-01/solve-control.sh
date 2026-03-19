@@ -19,7 +19,6 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
     aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
     aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
     tfe_hostname: "https://tfe-https-{{ guid }}.{{ domain }}"
-    tfe_internal: "https://terraform"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
     tfe_project_name: rhdp-initial-project
@@ -33,7 +32,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
 
     - name: Get TFE projects
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/organizations/{{ tfe_org }}/projects"
+        url: "{{ tfe_hostname }}/api/v2/organizations/{{ tfe_org }}/projects"
         method: GET
         headers:
           Authorization: "Bearer {{ tfe_api_token }}"
@@ -47,7 +46,7 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
 
     - name: Check if TFE workspace exists
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/organizations/{{ tfe_org }}/workspaces/{{ tfe_workspace_name }}"
+        url: "{{ tfe_hostname }}/api/v2/organizations/{{ tfe_org }}/workspaces/{{ tfe_workspace_name }}"
         method: GET
         headers:
           Authorization: "Bearer {{ tfe_api_token }}"
@@ -58,8 +57,9 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
 
     - name: Create TFE workspace
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/organizations/{{ tfe_org }}/workspaces"
+        url: "{{ tfe_hostname }}/api/v2/organizations/{{ tfe_org }}/workspaces"
         method: POST
+        follow_redirects: all
         headers:
           Authorization: "Bearer {{ tfe_api_token }}"
           Content-Type: "application/vnd.api+json"
@@ -79,18 +79,19 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: false
         status_code: [200, 201]
       register: tfe_ws_create
-      when: tfe_ws_check.status == 404
+
+    - name: Print the tfe_ws_create value
+      ansible.builtin.debug:
+        msg: "{{ tfe_ws_create }}"
 
     - name: Set workspace ID
       ansible.builtin.set_fact:
         tfe_workspace_id: >-
-          {{ tfe_ws_create.json.data.id
-             if tfe_ws_check.status == 404
-             else tfe_ws_check.json.data.id }}
+          {{ tfe_ws_create.json.data.id }}
 
     - name: Get existing workspace variables
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+        url: "{{ tfe_hostname }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
         method: GET
         headers:
           Authorization: "Bearer {{ tfe_api_token }}"
@@ -100,8 +101,9 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
 
     - name: Add AWS_ACCESS_KEY_ID env var to workspace
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+        url: "{{ tfe_hostname }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
         method: POST
+        follow_redirects: all
         body_format: json
         body:
           data:
@@ -123,8 +125,9 @@ cat > /tmp/setup-scripts/solve_module_01.yml << 'ENDOFPLAY'
 
     - name: Add AWS_SECRET_ACCESS_KEY env var to workspace
       ansible.builtin.uri:
-        url: "{{ tfe_internal }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+        url: "{{ tfe_hostname }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
         method: POST
+        follow_redirects: all
         body_format: json
         body:
           data:
