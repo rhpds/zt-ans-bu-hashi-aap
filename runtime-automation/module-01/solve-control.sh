@@ -1,5 +1,13 @@
 #!/bin/bash
 
+cat <<EOF > /tmp/runtime-scripts/env_vars.yml
+guid: "$GUID"
+domain: "$DOMAIN"
+aws_access_key: "$AWS_ACCESS_KEY_ID"
+aws_secret_key: "$AWS_SECRET_ACCESS_KEY"
+tfe_api_token: "$TFE_API_TOKEN"
+EOF
+
 cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
 ---
 - name: Solve Module 01 - AAP + Terraform Enterprise
@@ -9,20 +17,18 @@ cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
   collections:
     - ansible.controller
 
+  vars_files:
+    - /tmp/runtime-scripts/env_vars.yml
+
   vars:
     aap_host: "https://localhost"
     aap_username: admin
     aap_password: "ansible123!"
     aap_validate_certs: false
-    guid: "{{ lookup('env', 'GUID') }}"
-    domain: "{{ lookup('env', 'DOMAIN') }}"
-    aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-    aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
     tfe_hostname: "https://tfe-https-{{ guid }}.{{ domain }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
     tfe_project_name: rhdp-initial-project
-    tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') }}"
 
   tasks:
 
