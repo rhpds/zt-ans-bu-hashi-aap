@@ -1,27 +1,34 @@
 ---
-- name: Run module stage via direct API calls
+- name: Build inventory
   hosts: localhost
-  connection: local
   gather_facts: false
+  tasks:
+    - name: Add control node
+      ansible.builtin.add_host:
+        name: control
+        ansible_ssh_host: "{{ lookup('env', 'BASTION_HOST') | default('control') }}"
+        ansible_ssh_port: "{{ lookup('env', 'BASTION_PORT') | default('22') }}"
+        ansible_ssh_user: "{{ lookup('env', 'BASTION_USER') | default('rhel') }}"
+        ansible_ssh_pass: "{{ lookup('env', 'BASTION_PASSWORD') }}"
+        ansible_python_interpreter: /usr/libexec/platform-python
 
+- name: Run module tasks on control node
+  hosts: control
+  gather_facts: false
+  become: false
   vars:
-    guid: "{{ lookup('env', 'GUID') }}"
-    domain: "{{ lookup('env', 'DOMAIN') }}"
-    # Use internal hostnames — nodes communicate directly without GUID/DOMAIN
-    aap_host: "https://control"
-    aap_username: "{{ aap_admin_username | default('admin') }}"
-    aap_password: "{{ aap_admin_password | default('ansible123!') }}"
+    # Support both variable names
+    _module_dir: "{{ module_dir | default(module_directory | default('')) }}"
+    # AAP 2.6 — gateway and controller APIs on localhost (running on control node)
+    aap_host: "https://localhost"
+    aap_gateway_host: "https://localhost"
+    aap_username: "admin"
+    aap_password: "ansible123!"
     tfe_host: "https://terraform"
     tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
-    # Support both variable names — jobs.py sends module_directory, older configs use module_dir
-    _module_dir: "{{ module_dir | default(module_directory | default('')) }}"
 
   tasks:
-    - name: Load secrets if available
-      ansible.builtin.include_vars: ../config/secrets.yaml
-      ignore_errors: true
-
     - name: Include module tasks
       ansible.builtin.include_tasks: "{{ _module_dir }}/{{ module_stage }}.yml"
