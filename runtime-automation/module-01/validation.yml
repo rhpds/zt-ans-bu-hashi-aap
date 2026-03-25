@@ -1,7 +1,6 @@
 ---
 # Validate Module 01 - AAP + Terraform Enterprise
 # Called by nookbag when user clicks Next (stage: validation)
-# Runs on localhost (runner container), calls AAP 2.6 Controller API
 
 - name: Check TFE credential type exists
   ansible.builtin.uri:
@@ -99,12 +98,14 @@
          and r_wf_apply.json.count > 0
          and r_wf_destroy.json.count > 0 }}
 
-- name: Write results to script.out
+- name: Write failure output to validation_failure.out
   ansible.builtin.copy:
     content: "{{ validation_output }}"
-    dest: "{{ job_info_dir }}/script.out"
+    dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
-  when: job_info_dir is defined
+  when:
+    - job_info_dir is defined
+    - not validation_passed | bool
 
 - name: Fail if validation did not pass
   ansible.builtin.fail:

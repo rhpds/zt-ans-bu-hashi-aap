@@ -1,6 +1,5 @@
 ---
 # Validate Module 02 - Vault Secret Engine + AppRole + AAP credentials + templates
-# Called by nookbag when user clicks Next (stage: validation)
 
 - name: Login to Vault via userpass
   ansible.builtin.uri:
@@ -140,12 +139,14 @@
          and r_wf_tfe.json.count > 0 }}
   ignore_errors: true
 
-- name: Write results to script.out
+- name: Write failure output to validation_failure.out
   ansible.builtin.copy:
     content: "{{ validation_output }}"
-    dest: "{{ job_info_dir }}/script.out"
+    dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
-  when: job_info_dir is defined
+  when:
+    - job_info_dir is defined
+    - not validation_passed | default(false) | bool
 
 - name: Fail if validation did not pass
   ansible.builtin.fail:
