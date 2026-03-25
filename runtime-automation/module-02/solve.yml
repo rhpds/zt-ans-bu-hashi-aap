@@ -1,0 +1,449 @@
+---
+# Solve Module 02 - Vault Secret Engine + AppRole + AAP Credentials + Templates
+# Creates resources only — does NOT launch any workflows
+
+# -------------------------------------------------------------------
+# Step 1: Login to Vault
+# -------------------------------------------------------------------
+
+- name: Login to Vault via userpass
+  ansible.builtin.uri:
+    url: "https://vault-https/v1/auth/userpass/login/admin"
+    method: POST
+    validate_certs: false
+    body_format: json
+    body:
+      password: "ansible123!"
+  register: r_vault_login
+
+- name: Set Vault token
+  ansible.builtin.set_fact:
+    vault_token: "{{ r_vault_login.json.auth.client_token }}"
+    vault_url: "https://vault-https"
+
+# -------------------------------------------------------------------
+# Step 2: Enable Vault KV v2 secrets engine at 'secret'
+# -------------------------------------------------------------------
+
+- name: Check if KV engine already mounted at 'secret'
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/mounts"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+  register: r_mounts
+
+- name: Enable KV v2 secrets engine at 'secret'
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/mounts/secret"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body:
+      type: kv
+      options:
+        version: "2"
+    status_code: [200, 204]
+  when: "'secret/' not in (r_mounts.json.keys() | list | join(','))"
+
+# -------------------------------------------------------------------
+# Step 3: Create aws_creds secret
+# -------------------------------------------------------------------
+
+- name: Create aws_creds secret in Vault
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/secret/data/aws_creds"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body:
+      data:
+        access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('REPLACE_WITH_AWS_ACCESS_KEY') }}"
+        secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('REPLACE_WITH_AWS_SECRET_KEY') }}"
+    status_code: [200, 204]
+
+# -------------------------------------------------------------------
+# Step 4: Create Vault policy aap-terraform-policy
+# -------------------------------------------------------------------
+
+- name: Create aap-terraform-policy in Vault
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/policies/acl/aap-terraform-policy"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body:
+      policy: |
+        path "secret/data/aws_creds" {
+          capabilities = ["read"]
+        }
+        path "secret/data/*/ssh-keys/*" {
+          capabilities = ["create", "read", "update", "delete"]
+        }
+        path "secret/data/rhel-server/ssh-keys/*" {
+          capabilities = ["create", "read", "update", "delete"]
+        }
+        path "auth/token/create" {
+          capabilities = ["create", "update"]
+        }
+        path "auth/token/renew-self" {
+          capabilities = ["update"]
+        }
+        path "auth/token/lookup-self" {
+          capabilities = ["read"]
+        }
+        path "secret/metadata/*" {
+          capabilities = ["list", "read"]
+        }
+        path "secret/data/*/metadata" {
+          capabilities = ["create", "read", "update", "delete"]
+        }
+    status_code: [200, 204]
+
+# -------------------------------------------------------------------
+# Step 5: Enable AppRole auth method
+# -------------------------------------------------------------------
+
+- name: Check if AppRole is already enabled
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/auth"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+  register: r_auth
+
+- name: Enable AppRole auth method
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/auth/approle"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body:
+      type: approle
+    status_code: [200, 204]
+  when: "'approle/' not in (r_auth.json.keys() | list | join(','))"
+
+# -------------------------------------------------------------------
+# Step 6: Create AppRole role aapterraform
+# -------------------------------------------------------------------
+
+- name: Create AppRole role aapterraform
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/aapterraform"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body:
+      token_policies: aap-terraform-policy
+    status_code: [200, 204]
+
+- name: Get AppRole role_id
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/aapterraform/role-id"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+  register: r_role_id
+
+- name: Generate AppRole secret_id
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/aapterraform/secret-id"
+    method: POST
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    body_format: json
+    body: {}
+    status_code: [200, 204]
+  register: r_secret_id
+
+- name: Set AppRole credentials
+  ansible.builtin.set_fact:
+    approle_role_id: "{{ r_role_id.json.data.role_id }}"
+    approle_secret_id: "{{ r_secret_id.json.data.secret_id }}"
+    vault_external_url: "https://vault-{{ lookup('env', 'GUID') }}.{{ lookup('env', 'DOMAIN') }}"
+
+# -------------------------------------------------------------------
+# Step 7: Create AAP Vault lookup credential
+# -------------------------------------------------------------------
+
+- name: Get HashiCorp Vault Secret Lookup credential type ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credential_types/?name=HashiCorp+Vault+Secret+Lookup"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_cred_type
+
+- name: Get Default org ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/organizations/?name=Default"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_org
+
+- name: Check if Vault lookup credential already exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+lookup+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_cred_check
+
+- name: Create Vault lookup credential in AAP
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "Vault lookup credential"
+      organization: "{{ r_org.json.results[0].id }}"
+      credential_type: "{{ r_vault_cred_type.json.results[0].id }}"
+      inputs:
+        url: "{{ vault_external_url }}"
+        role_id: "{{ approle_role_id }}"
+        secret_id: "{{ approle_secret_id }}"
+        default_auth_path: approle
+        api_version: v2
+    status_code: [200, 201]
+  when: r_vault_cred_check.json.count == 0
+
+# -------------------------------------------------------------------
+# Step 8: Create Vault MACHINE SSH credential
+# -------------------------------------------------------------------
+
+- name: Get Machine credential type ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credential_types/?name=Machine"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_machine_cred_type
+
+- name: Get Vault lookup credential ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+lookup+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_lookup_cred
+
+- name: Check if Vault MACHINE SSH credential already exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+MACHINE+SSH+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_ssh_cred_check
+
+- name: Create Vault MACHINE SSH credential in AAP
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "Vault MACHINE SSH credential"
+      organization: "{{ r_org.json.results[0].id }}"
+      credential_type: "{{ r_machine_cred_type.json.results[0].id }}"
+      inputs:
+        username: ec2-user
+    status_code: [200, 201]
+  when: r_ssh_cred_check.json.count == 0
+
+# -------------------------------------------------------------------
+# Step 9: Create 'Install Nginx on RHEL - TFE-VCS' job template
+# -------------------------------------------------------------------
+
+- name: Get original 'Install Nginx on RHEL' job template
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Install+Nginx+on+RHEL"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_original
+
+- name: Check if TFE-VCS job template already exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Install+Nginx+on+RHEL+-+TFE-VCS"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_tfe_check
+
+- name: Create 'Install Nginx on RHEL - TFE-VCS' job template
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "Install Nginx on RHEL - TFE-VCS"
+      job_type: run
+      organization: "{{ r_org.json.results[0].id }}"
+      inventory: "{{ r_jt_original.json.results[0].inventory | default(omit) }}"
+      project: "{{ r_jt_original.json.results[0].project | default(omit) }}"
+      playbook: "{{ r_jt_original.json.results[0].playbook | default('playbooks/install_nginx.yml') }}"
+      execution_environment: "{{ r_jt_original.json.results[0].execution_environment | default(omit) }}"
+    status_code: [200, 201]
+  register: r_jt_tfe_create
+  when: r_jt_tfe_check.json.count == 0
+
+- name: Add Vault MACHINE SSH credential to TFE-VCS job template
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/{{ r_jt_tfe_create.json.id | default(r_jt_tfe_check.json.results[0].id) }}/credentials/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      id: "{{ r_vault_lookup_cred.json.results[0].id }}"
+    status_code: [200, 204]
+  when: r_jt_tfe_check.json.count == 0
+
+# -------------------------------------------------------------------
+# Step 10: Create 'WF-Launched by TFE' workflow template
+# -------------------------------------------------------------------
+
+- name: Check if WF-Launched by TFE already exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Launched+by+TFE"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_check
+
+- name: Create 'WF-Launched by TFE' workflow template
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "WF-Launched by TFE"
+      organization: "{{ r_org.json.results[0].id }}"
+      ask_inventory_on_launch: true
+    status_code: [200, 201]
+  register: r_wf_create
+  when: r_wf_check.json.count == 0
+
+- name: Set workflow ID
+  ansible.builtin.set_fact:
+    wf_id: "{{ r_wf_create.json.id | default(r_wf_check.json.results[0].id) }}"
+
+- name: Get inventory source 'AWS source for TFE resources' ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_inv_source
+
+- name: Add inventory sync node to workflow
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      workflow_job_template: "{{ wf_id }}"
+      unified_job_template: "{{ r_inv_source.json.results[0].id }}"
+    status_code: [200, 201]
+  register: r_node1
+  when:
+    - r_wf_check.json.count == 0
+    - r_inv_source.json.count > 0
+
+- name: Add Install Nginx TFE-VCS node to workflow
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      workflow_job_template: "{{ wf_id }}"
+      unified_job_template: "{{ r_jt_tfe_create.json.id | default(r_jt_tfe_check.json.results[0].id) }}"
+    status_code: [200, 201]
+  register: r_node2
+  when: r_wf_check.json.count == 0
+
+- name: Link nodes (inv sync success -> nginx install)
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_node1.json.id }}/success_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      id: "{{ r_node2.json.id }}"
+    status_code: [200, 204]
+  when:
+    - r_wf_check.json.count == 0
+    - r_node1 is defined
+    - r_node2 is defined
+
+# -------------------------------------------------------------------
+# Write output
+# -------------------------------------------------------------------
+
+- name: Write solve output to script.out
+  ansible.builtin.copy:
+    content: |
+      Module 2 Solved
+      ===============
+      \u2714 Vault KV v2 engine enabled at 'secret'
+      \u2714 Secret 'aws_creds' created (update AWS keys from the Cloud tab if needed)
+      \u2714 Policy 'aap-terraform-policy' created
+      \u2714 AppRole auth method enabled
+      \u2714 AppRole role 'aapterraform' created
+      \u2714 AAP credential 'Vault lookup credential' created
+      \u2714 AAP credential 'Vault MACHINE SSH credential' created
+      \u2714 Job template 'Install Nginx on RHEL - TFE-VCS' created
+      \u2714 Workflow 'WF-Launched by TFE' created with nodes
+    dest: "{{ job_info_dir }}/script.out"
+  delegate_to: localhost
+  when: job_info_dir is defined

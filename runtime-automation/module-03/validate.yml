@@ -1,0 +1,126 @@
+---
+# Validate Module 03 - TFE VCS Workspace + Trigger
+# Checks: TFE-Demo-VCS workspace exists, has runs, AAP WF-Launched by TFE was triggered
+
+# -------------------------------------------------------------------
+# Step 1: Login to Vault to get token (needed for TFE token path)
+# -------------------------------------------------------------------
+
+- name: Login to Vault via userpass
+  ansible.builtin.uri:
+    url: "https://vault-https/v1/auth/userpass/login/admin"
+    method: POST
+    validate_certs: false
+    body_format: json
+    body:
+      password: "ansible123!"
+  register: r_vault_login
+  ignore_errors: true
+
+# -------------------------------------------------------------------
+# Step 2: Check TFE workspace TFE-Demo-VCS exists
+# -------------------------------------------------------------------
+
+- name: Read TFE API token from Vault
+  ansible.builtin.uri:
+    url: "https://vault-https/v1/secret/data/tfe-api-token"
+    headers:
+      X-Vault-Token: "{{ r_vault_login.json.auth.client_token | default('') }}"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_tfe_token_vault
+  ignore_errors: true
+
+- name: Set TFE API token
+  ansible.builtin.set_fact:
+    tfe_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('') }}"
+
+- name: Check TFE workspace TFE-Demo-VCS exists
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces/TFE-Demo-VCS"
+    headers:
+      Authorization: "Bearer {{ tfe_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_vcs_workspace
+  when: tfe_token | length > 0
+
+- name: Check TFE workspace has at least one run
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ r_vcs_workspace.json.data.id }}/runs?page[size]=1"
+    headers:
+      Authorization: "Bearer {{ tfe_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+  register: r_tfe_runs
+  when:
+    - tfe_token | length > 0
+    - r_vcs_workspace.status | default(404) == 200
+  ignore_errors: true
+
+# -------------------------------------------------------------------
+# Step 3: Check AAP WF-Launched by TFE has run history
+# -------------------------------------------------------------------
+
+- name: Get WF-Launched by TFE workflow ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Launched+by+TFE"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_tfe
+
+- name: Check workflow job history
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_jobs/?workflow_job_template={{ r_wf_tfe.json.results[0].id }}&page_size=1"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_jobs
+  when: r_wf_tfe.json.count > 0
+  ignore_errors: true
+
+# -------------------------------------------------------------------
+# Step 4: Build results
+# -------------------------------------------------------------------
+
+- name: Build validation results
+  ansible.builtin.set_fact:
+    vcs_workspace_exists: "{{ r_vcs_workspace.status | default(404) == 200 }}"
+    tfe_has_runs: "{{ (r_tfe_runs.json.data | default([]) | length) > 0 }}"
+    wf_exists: "{{ r_wf_tfe.json.count > 0 }}"
+    wf_has_runs: "{{ (r_wf_jobs.json.count | default(0)) > 0 }}"
+  ignore_errors: true
+
+- name: Build validation output
+  ansible.builtin.set_fact:
+    validation_output: |
+      Module 3 Validation Results
+      ============================
+      TFE:
+      {{ '\u2714' if vcs_workspace_exists | default(false) | bool else '\u2718' }} Workspace 'TFE-Demo-VCS' created with VCS
+      {{ '\u2714' if tfe_has_runs | default(false) | bool else '\u2718' }} TFE workspace has been triggered (at least one run)
+
+      AAP:
+      {{ '\u2714' if wf_exists | default(false) | bool else '\u2718' }} Workflow 'WF-Launched by TFE' exists
+      {{ '\u2714' if wf_has_runs | default(false) | bool else '\u2718' }} Workflow 'WF-Launched by TFE' was triggered by TFE
+    validation_passed: >-
+      {{ (vcs_workspace_exists | default(false) | bool)
+         and (tfe_has_runs | default(false) | bool)
+         and (wf_exists | default(false) | bool) }}
+  ignore_errors: true
+
+- name: Write results to script.out
+  ansible.builtin.copy:
+    content: "{{ validation_output }}"
+    dest: "{{ job_info_dir }}/script.out"
+  delegate_to: localhost
+  when: job_info_dir is defined
+
+- name: Fail if validation did not pass
+  ansible.builtin.fail:
+    msg: "One or more checks failed. Complete the missing tasks and try again."
+  when: not validation_passed | default(false) | bool

@@ -1,0 +1,169 @@
+---
+# Validate Module 02 - Vault Secret Engine + AAP AppRole + Job/Workflow Templates
+# Runs on localhost (runner container), calls Vault and AAP APIs directly
+
+# -------------------------------------------------------------------
+# Step 1: Get Vault token via userpass
+# -------------------------------------------------------------------
+
+- name: Login to Vault via userpass
+  ansible.builtin.uri:
+    url: "{{ tfe_host | regex_replace('tfe-https', 'vault-https') }}/v1/auth/userpass/login/admin"
+    method: POST
+    validate_certs: false
+    body_format: json
+    body:
+      password: "ansible123!"
+  register: r_vault_login
+  ignore_errors: true
+
+- name: Set Vault token and base URL
+  ansible.builtin.set_fact:
+    vault_token: "{{ r_vault_login.json.auth.client_token | default('') }}"
+    vault_url: "https://vault-https"
+
+# -------------------------------------------------------------------
+# Step 2: Check Vault resources
+# -------------------------------------------------------------------
+
+- name: Check Vault KV secrets engine at 'secret' is enabled
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/mounts"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+  register: r_vault_mounts
+  ignore_errors: true
+
+- name: Check Vault secret aws_creds exists
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/secret/metadata/aws_creds"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_aws_secret
+  ignore_errors: true
+
+- name: Check Vault policy aap-terraform-policy exists
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/policies/acl/aap-terraform-policy"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_vault_policy
+  ignore_errors: true
+
+- name: Check Vault AppRole auth method enabled
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/sys/auth"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+  register: r_vault_auth
+  ignore_errors: true
+
+- name: Check Vault AppRole role aapterraform exists
+  ansible.builtin.uri:
+    url: "{{ vault_url }}/v1/auth/approle/role/aapterraform"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_approle_role
+  ignore_errors: true
+
+# -------------------------------------------------------------------
+# Step 3: Check AAP resources
+# -------------------------------------------------------------------
+
+- name: Check AAP Vault lookup credential exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+lookup+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_cred
+
+- name: Check AAP Vault MACHINE SSH credential exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+MACHINE+SSH+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_ssh_cred
+
+- name: Check job template 'Install Nginx on RHEL - TFE-VCS' exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Install+Nginx+on+RHEL+-+TFE-VCS"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_tfe_vcs
+
+- name: Check workflow 'WF-Launched by TFE' exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Launched+by+TFE"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_tfe
+
+# -------------------------------------------------------------------
+# Step 4: Build results and write to script.out
+# -------------------------------------------------------------------
+
+- name: Set facts for vault checks
+  ansible.builtin.set_fact:
+    vault_kv_ok: "{{ 'secret/' in (r_vault_mounts.json.keys() | list | join(',')) }}"
+    vault_secret_ok: "{{ r_aws_secret.status | default(404) == 200 }}"
+    vault_policy_ok: "{{ r_vault_policy.status | default(404) == 200 }}"
+    vault_approle_ok: "{{ 'approle/' in (r_vault_auth.json.keys() | list | join(',')) }}"
+    vault_role_ok: "{{ r_approle_role.status | default(404) == 200 }}"
+  ignore_errors: true
+
+- name: Build validation results
+  ansible.builtin.set_fact:
+    validation_output: |
+      Module 2 Validation Results
+      ============================
+      Vault:
+      {{ '\u2714' if vault_kv_ok | default(false) | bool else '\u2718' }} KV secrets engine enabled at 'secret'
+      {{ '\u2714' if vault_secret_ok | default(false) | bool else '\u2718' }} Secret 'aws_creds' created
+      {{ '\u2714' if vault_policy_ok | default(false) | bool else '\u2718' }} Policy 'aap-terraform-policy' created
+      {{ '\u2714' if vault_approle_ok | default(false) | bool else '\u2718' }} AppRole auth method enabled
+      {{ '\u2714' if vault_role_ok | default(false) | bool else '\u2718' }} AppRole role 'aapterraform' created
+
+      AAP:
+      {{ '\u2714' if r_vault_cred.json.count > 0 else '\u2718' }} Credential: Vault lookup credential
+      {{ '\u2714' if r_ssh_cred.json.count > 0 else '\u2718' }} Credential: Vault MACHINE SSH credential
+      {{ '\u2714' if r_jt_tfe_vcs.json.count > 0 else '\u2718' }} Job template: Install Nginx on RHEL - TFE-VCS
+      {{ '\u2714' if r_wf_tfe.json.count > 0 else '\u2718' }} Workflow: WF-Launched by TFE
+    validation_passed: >-
+      {{ (vault_kv_ok | default(false) | bool)
+         and (vault_secret_ok | default(false) | bool)
+         and (vault_policy_ok | default(false) | bool)
+         and (vault_approle_ok | default(false) | bool)
+         and (vault_role_ok | default(false) | bool)
+         and r_vault_cred.json.count > 0
+         and r_ssh_cred.json.count > 0
+         and r_jt_tfe_vcs.json.count > 0
+         and r_wf_tfe.json.count > 0 }}
+  ignore_errors: true
+
+- name: Write results to script.out
+  ansible.builtin.copy:
+    content: "{{ validation_output }}"
+    dest: "{{ job_info_dir }}/script.out"
+  delegate_to: localhost
+  when: job_info_dir is defined
+
+- name: Fail if validation did not pass
+  ansible.builtin.fail:
+    msg: "One or more checks failed. Complete the missing tasks and try again."
+  when: not validation_passed | default(false) | bool
