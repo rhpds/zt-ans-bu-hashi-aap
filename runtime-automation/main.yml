@@ -15,7 +15,7 @@
 
   tasks:
     - name: Load secrets if available
-      ansible.builtin.include_vars: ../config/secrets.yaml
+      ansible.builtin.include_vars: ./secrets.yaml
 
     - name: Include module tasks
       ansible.builtin.include_tasks: "{{ _module_dir }}/{{ module_stage }}.yml"
