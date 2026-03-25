@@ -1,64 +1,64 @@
 ---
 # Validate Module 01 - AAP + Terraform Enterprise
-# Runs on localhost (validation-scripts container), calls AAP API directly
+# Runs on control node via SSH, calls AAP 2.6 Controller API at https://localhost/api/controller/v2/
 
-- name: Check TFE credential type exists in AAP
+- name: Check TFE credential type exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/credential_types/?name=Terraform+Enterprise+credential+type"
+    url: "{{ aap_host }}/api/controller/v2/credential_types/?name=Terraform+Enterprise+credential+type"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_cred_type
 
-- name: Check TFE credential exists in AAP
+- name: Check TFE credential exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/credentials/?name=Terraform+Enterprise+credential"
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Terraform+Enterprise+credential"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_credential
 
-- name: Check inventory source exists in AAP
+- name: Check inventory source exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
+    url: "{{ aap_host }}/api/controller/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_inv_source
 
-- name: Check APPLY job template exists in AAP
+- name: Check APPLY job template exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/job_templates/?name=Terraform+Enterprise+APPLY"
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+APPLY"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_jt_apply
 
-- name: Check DESTROY job template exists in AAP
+- name: Check DESTROY job template exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/job_templates/?name=Terraform+Enterprise+DESTROY"
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+DESTROY"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_jt_destroy
 
-- name: Check WF-APPLY workflow exists in AAP
+- name: Check WF-APPLY workflow exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+APPLY"
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+APPLY"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
     validate_certs: false
   register: r_wf_apply
 
-- name: Check WF-DESTROY workflow exists in AAP
+- name: Check WF-DESTROY workflow exists
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+DESTROY"
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+DESTROY"
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
     force_basic_auth: true
@@ -74,21 +74,21 @@
     validate_certs: false
     status_code: [200, 404]
   register: r_tfe_workspace
-  when: tfe_api_token | length > 0
+  when: tfe_api_token | default('') | length > 0
 
 - name: Build validation results
   ansible.builtin.set_fact:
     validation_output: |
       Module 1 Validation Results
       ============================
-      {{ '✔' if r_cred_type.json.count > 0 else '✘' }} TFE credential type
-      {{ '✔' if r_credential.json.count > 0 else '✘' }} TFE credential
-      {{ '✔' if r_inv_source.json.count > 0 else '✘' }} Inventory source (AWS source for TFE resources)
-      {{ '✔' if r_jt_apply.json.count > 0 else '✘' }} Job template: Terraform Enterprise APPLY
-      {{ '✔' if r_jt_destroy.json.count > 0 else '✘' }} Job template: Terraform Enterprise DESTROY
-      {{ '✔' if r_wf_apply.json.count > 0 else '✘' }} Workflow: WF-Terraform Enterprise APPLY
-      {{ '✔' if r_wf_destroy.json.count > 0 else '✘' }} Workflow: WF-Terraform Enterprise DESTROY
-      {{ '✔' if (r_tfe_workspace is defined and r_tfe_workspace.status == 200) else '✘' }} TFE workspace: {{ tfe_workspace_name }}
+      {{ '\u2714' if r_cred_type.json.count > 0 else '\u2718' }} TFE credential type
+      {{ '\u2714' if r_credential.json.count > 0 else '\u2718' }} TFE credential
+      {{ '\u2714' if r_inv_source.json.count > 0 else '\u2718' }} Inventory source (AWS source for TFE resources)
+      {{ '\u2714' if r_jt_apply.json.count > 0 else '\u2718' }} Job template: Terraform Enterprise APPLY
+      {{ '\u2714' if r_jt_destroy.json.count > 0 else '\u2718' }} Job template: Terraform Enterprise DESTROY
+      {{ '\u2714' if r_wf_apply.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise APPLY
+      {{ '\u2714' if r_wf_destroy.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise DESTROY
+      {{ '\u2714' if (r_tfe_workspace is defined and r_tfe_workspace.status == 200) else '\u2718' }} TFE workspace: {{ tfe_workspace_name }}
     validation_passed: >-
       {{ r_cred_type.json.count > 0
          and r_credential.json.count > 0
@@ -102,11 +102,8 @@
   ansible.builtin.copy:
     content: "{{ validation_output }}"
     dest: "{{ job_info_dir }}/script.out"
+  delegate_to: localhost
   when: job_info_dir is defined
-
-- name: Print results
-  ansible.builtin.debug:
-    msg: "{{ validation_output }}"
 
 - name: Fail if validation did not pass
   ansible.builtin.fail:
