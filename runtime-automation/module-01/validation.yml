@@ -86,14 +86,14 @@
     validation_output: |
       Module 1 Validation Results
       ============================
-      {{ '\u2714' if r_cred_type.json.count > 0 else '\u2718' }} TFE credential type
-      {{ '\u2714' if r_credential.json.count > 0 else '\u2718' }} TFE credential
-      {{ '\u2714' if r_inv_source.json.count > 0 else '\u2718' }} Inventory source (AWS source for TFE resources)
-      {{ '\u2714' if r_jt_apply.json.count > 0 else '\u2718' }} Job template: Terraform Enterprise APPLY
-      {{ '\u2714' if r_jt_destroy.json.count > 0 else '\u2718' }} Job template: Terraform Enterprise DESTROY
-      {{ '\u2714' if r_wf_apply.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise APPLY
-      {{ '\u2714' if r_wf_destroy.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise DESTROY
-      {{ '\u2714' if tfe_workspace_ok | bool else '\u2718' }} TFE workspace: {{ tfe_workspace_name }}
+      {{ '[OK]' if r_cred_type.json.count > 0 else '[X] ' }} TFE credential type
+      {{ '[OK]' if r_credential.json.count > 0 else '[X] ' }} TFE credential
+      {{ '[OK]' if r_inv_source.json.count > 0 else '[X] ' }} Inventory source (AWS source for TFE resources)
+      {{ '[OK]' if r_jt_apply.json.count > 0 else '[X] ' }} Job template: Terraform Enterprise APPLY
+      {{ '[OK]' if r_jt_destroy.json.count > 0 else '[X] ' }} Job template: Terraform Enterprise DESTROY
+      {{ '[OK]' if r_wf_apply.json.count > 0 else '[X] ' }} Workflow: WF-Terraform Enterprise APPLY
+      {{ '[OK]' if r_wf_destroy.json.count > 0 else '[X] ' }} Workflow: WF-Terraform Enterprise DESTROY
+      {{ '[OK]' if tfe_workspace_ok | bool else '[X] ' }} TFE workspace: {{ tfe_workspace_name }}
     validation_passed: >-
       {{ r_cred_type.json.count > 0
          and r_credential.json.count > 0
@@ -110,6 +110,7 @@
   delegate_to: localhost
   when:
     - job_info_dir is defined
+    - not validation_passed | bool
     - not validation_passed | bool
 
 - name: Fail if validation did not pass
