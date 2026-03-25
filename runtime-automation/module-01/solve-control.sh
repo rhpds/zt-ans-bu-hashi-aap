@@ -85,15 +85,17 @@ cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
         validate_certs: false
         status_code: [200, 201]
       register: tfe_ws_create
+      when: tfe_ws_check.status == 404
 
-    - name: Print the tfe_ws_create value
-      ansible.builtin.debug:
-        msg: "{{ tfe_ws_create }}"
-
-    - name: Set workspace ID
+    - name: Set workspace ID (from create)
       ansible.builtin.set_fact:
-        tfe_workspace_id: >-
-          {{ tfe_ws_create.json.data.id }}
+        tfe_workspace_id: "{{ tfe_ws_create.json.data.id }}"
+      when: tfe_ws_check.status == 404
+
+    - name: Set workspace ID (already exists)
+      ansible.builtin.set_fact:
+        tfe_workspace_id: "{{ tfe_ws_check.json.data.id }}"
+      when: tfe_ws_check.status == 200
 
     - name: Get existing workspace variables
       ansible.builtin.uri:
@@ -240,18 +242,8 @@ cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
         controller_host: "{{ aap_host }}"
         validate_certs: "{{ aap_validate_certs }}"
 
-    - name: Sync Terraform Inventory Source
-      ansible.controller.inventory_source_update:
-        name: "AWS source for TFE resources"
-        inventory: "Terraform Inventory"
-        organization: Default
-        controller_username: "{{ aap_username }}"
-        controller_password: "{{ aap_password }}"
-        controller_host: "{{ aap_host }}"
-        validate_certs: "{{ aap_validate_certs }}"
-
     # ===================================================================
-    # Task 5: Create APPLY Job Template + Workflow, then Launch
+    # Task 5: Create APPLY Job Template + Workflow
     # ===================================================================
 
     - name: Create Terraform Enterprise APPLY job template
@@ -317,17 +309,8 @@ cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
         controller_host: "{{ aap_host }}"
         validate_certs: "{{ aap_validate_certs }}"
 
-    - name: Launch WF-Terraform Enterprise APPLY
-      ansible.controller.workflow_launch:
-        workflow_template: "WF-Terraform Enterprise APPLY"
-        wait: true
-        controller_username: "{{ aap_username }}"
-        controller_password: "{{ aap_password }}"
-        controller_host: "{{ aap_host }}"
-        validate_certs: "{{ aap_validate_certs }}"
-
     # ===================================================================
-    # Task 6: Create DESTROY Job Template + Workflow, then Launch
+    # Task 6: Create DESTROY Job Template + Workflow
     # ===================================================================
 
     - name: Create Terraform Enterprise DESTROY job template
@@ -376,14 +359,9 @@ cat > /tmp/runtime-scripts/solve_module_01.yml << 'ENDOFPLAY'
         controller_host: "{{ aap_host }}"
         validate_certs: "{{ aap_validate_certs }}"
 
-    - name: Launch WF-Terraform Enterprise DESTROY
-      ansible.controller.workflow_launch:
-        workflow_template: "WF-Terraform Enterprise DESTROY"
-        wait: true
-        controller_username: "{{ aap_username }}"
-        controller_password: "{{ aap_password }}"
-        controller_host: "{{ aap_host }}"
-        validate_certs: "{{ aap_validate_certs }}"
+    - name: Solve complete
+      ansible.builtin.debug:
+        msg: "Module 01 solved. All resources created in AAP and TFE. No workflows were launched."
 
 ENDOFPLAY
 
