@@ -6,6 +6,7 @@ antora:
     - name: module-01
       label: "Red Hat Ansible Automation Platform and HashiCorp Terraform Enterprise"
       solveButton: true
+      validateButton: true
     - name: module-02
       label: "Trigger Infrastructure Provisioning and automation from Terraform Enterprise - Part 1"
     - name: module-03
