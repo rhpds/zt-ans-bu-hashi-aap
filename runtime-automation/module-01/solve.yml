@@ -1,0 +1,245 @@
+---
+# Solve Module 01 - AAP + Terraform Enterprise
+# Runs on localhost (validation-scripts container), calls AAP + TFE API directly
+# Creates resources only — does NOT launch any workflows
+
+# -------------------------------------------------------------------
+# TFE: Create workspace
+# -------------------------------------------------------------------
+
+- name: Get TFE projects
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/projects"
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+  register: r_tfe_projects
+
+- name: Set TFE project ID
+  ansible.builtin.set_fact:
+    tfe_project_id: "{{ r_tfe_projects.json.data | selectattr('attributes.name', 'equalto', 'rhdp-initial-project') | map(attribute='id') | first }}"
+
+- name: Check if TFE workspace already exists
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces/{{ tfe_workspace_name }}"
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_ws_check
+
+- name: Create TFE workspace
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    body_format: json
+    body:
+      data:
+        type: workspaces
+        attributes:
+          name: "{{ tfe_workspace_name }}"
+          description: "My Initial Workspace for my first TFE demo."
+          execution-mode: remote
+        relationships:
+          project:
+            data:
+              type: projects
+              id: "{{ tfe_project_id }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: r_ws_create
+  when: r_ws_check.status == 404
+
+- name: Set workspace ID (new)
+  ansible.builtin.set_fact:
+    tfe_workspace_id: "{{ r_ws_create.json.data.id }}"
+  when: r_ws_check.status == 404
+
+- name: Set workspace ID (existing)
+  ansible.builtin.set_fact:
+    tfe_workspace_id: "{{ r_ws_check.json.data.id }}"
+  when: r_ws_check.status == 200
+
+- name: Get existing workspace variables
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+  register: r_ws_vars
+
+- name: Add AWS_ACCESS_KEY_ID to workspace
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    body_format: json
+    body:
+      data:
+        type: vars
+        attributes:
+          key: AWS_ACCESS_KEY_ID
+          value: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+          category: env
+          sensitive: false
+    validate_certs: false
+    status_code: [200, 201]
+  when: r_ws_vars.json.data | selectattr('attributes.key', 'equalto', 'AWS_ACCESS_KEY_ID') | list | length == 0
+
+- name: Add AWS_SECRET_ACCESS_KEY to workspace
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ tfe_workspace_id }}/vars"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    body_format: json
+    body:
+      data:
+        type: vars
+        attributes:
+          key: AWS_SECRET_ACCESS_KEY
+          value: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+          category: env
+          sensitive: true
+    validate_certs: false
+    status_code: [200, 201]
+  when: r_ws_vars.json.data | selectattr('attributes.key', 'equalto', 'AWS_SECRET_ACCESS_KEY') | list | length == 0
+
+# -------------------------------------------------------------------
+# AAP: Get org ID
+# -------------------------------------------------------------------
+
+- name: Get Default org ID from AAP
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/organizations/?name=Default"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_org
+
+- name: Set org ID
+  ansible.builtin.set_fact:
+    aap_org_id: "{{ r_org.json.results[0].id }}"
+
+# -------------------------------------------------------------------
+# AAP: Create TFE credential type
+# -------------------------------------------------------------------
+
+- name: Check if TFE credential type exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/credential_types/?name=Terraform+Enterprise+credential+type"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_cred_type_check
+
+- name: Create TFE credential type
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/credential_types/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "Terraform Enterprise credential type"
+      kind: cloud
+      inputs:
+        fields:
+          - id: hostname
+            type: string
+            label: Terraform Enterprise Hostname
+          - id: org
+            type: string
+            label: Organization
+          - id: workspace
+            type: string
+            label: Workspace
+          - id: token
+            type: string
+            label: Token
+            secret: true
+        required: [hostname, org, workspace, token]
+      injectors:
+        extra_vars:
+          tf_hostname: "{{ '{{' }} hostname {{ '}}' }}"
+          tf_org: "{{ '{{' }} org {{ '}}' }}"
+          tf_workspace: "{{ '{{' }} workspace {{ '}}' }}"
+          tf_token: "{{ '{{' }} token {{ '}}' }}"
+    status_code: [200, 201]
+  register: r_cred_type_create
+  when: r_cred_type_check.json.count == 0
+
+- name: Set credential type ID
+  ansible.builtin.set_fact:
+    cred_type_id: "{{ r_cred_type_create.json.id if r_cred_type_check.json.count == 0 else r_cred_type_check.json.results[0].id }}"
+
+# -------------------------------------------------------------------
+# AAP: Create TFE credential
+# -------------------------------------------------------------------
+
+- name: Check if TFE credential exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/credentials/?name=Terraform+Enterprise+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_cred_check
+
+- name: Create TFE credential
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/credentials/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "Terraform Enterprise credential"
+      organization: "{{ aap_org_id }}"
+      credential_type: "{{ cred_type_id }}"
+      inputs:
+        hostname: "{{ tfe_host }}"
+        org: "{{ tfe_org }}"
+        workspace: "{{ tfe_workspace_name }}"
+        token: "{{ tfe_api_token }}"
+    status_code: [200, 201]
+  when: r_cred_check.json.count == 0
+
+# -------------------------------------------------------------------
+# AAP: Write solve output
+# -------------------------------------------------------------------
+
+- name: Write solve output to script.out
+  ansible.builtin.copy:
+    content: |
+      Module 1 Solved
+      ===============
+      ✔ TFE workspace created/verified: {{ tfe_workspace_name }}
+      ✔ AWS credentials added to workspace
+      ✔ TFE credential type created in AAP
+      ✔ TFE credential created in AAP
+
+      Remaining tasks (inventory source, job templates, workflows)
+      require the Terraform Execution Environment to be available.
+      Complete Tasks 5-7 in the lab instructions.
+    dest: "{{ job_info_dir }}/script.out"
+  when: job_info_dir is defined
+
+- name: Print solve summary
+  ansible.builtin.debug:
+    msg: "Module 1 partially solved via API. TFE workspace and AAP credentials created."
