@@ -2,10 +2,6 @@
 # Solve Module 01 - AAP + Terraform Enterprise
 # Creates ALL required resources — does NOT launch any workflows
 
-# -------------------------------------------------------------------
-# Step 1: Get prerequisite resource IDs from AAP
-# -------------------------------------------------------------------
-
 - name: Get Default org ID
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/organizations/?name=Default"
@@ -82,10 +78,7 @@
     aws_cred_id: "{{ r_aws_cred.json.results[0].id | default(0) }}"
     nginx_jt_id: "{{ r_nginx_jt.json.results[0].id | default(0) }}"
 
-# -------------------------------------------------------------------
-# Step 2: TFE Workspace
-# -------------------------------------------------------------------
-
+# TFE Workspace
 - name: Get TFE projects
   ansible.builtin.uri:
     url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/projects"
@@ -138,10 +131,7 @@
     - tfe_api_token | default('') | length > 0
     - r_ws_check.status == 404
 
-# -------------------------------------------------------------------
-# Step 3: TFE Credential Type
-# -------------------------------------------------------------------
-
+# TFE Credential Type
 - name: Check TFE credential type exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/credential_types/?name=Terraform+Enterprise+credential+type"
@@ -193,10 +183,7 @@
   ansible.builtin.set_fact:
     cred_type_id: "{{ r_cred_type_create.json.id if r_cred_type_check.json.count == 0 else r_cred_type_check.json.results[0].id }}"
 
-# -------------------------------------------------------------------
-# Step 4: TFE Credential
-# -------------------------------------------------------------------
-
+# TFE Credential
 - name: Check TFE credential exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/credentials/?name=Terraform+Enterprise+credential"
@@ -232,10 +219,7 @@
   ansible.builtin.set_fact:
     tfe_cred_id: "{{ r_cred_create.json.id if r_cred_check.json.count == 0 else r_cred_check.json.results[0].id }}"
 
-# -------------------------------------------------------------------
-# Step 5: Inventory Source
-# -------------------------------------------------------------------
-
+# Inventory Source
 - name: Check inventory source exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
@@ -272,10 +256,7 @@
   ansible.builtin.set_fact:
     inv_source_id: "{{ r_inv_source_create.json.id if r_inv_source_check.json.count == 0 else r_inv_source_check.json.results[0].id }}"
 
-# -------------------------------------------------------------------
-# Step 6: Job Template — Terraform Enterprise APPLY
-# -------------------------------------------------------------------
-
+# Job Template — APPLY (no extra_vars needed)
 - name: Check APPLY job template exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+APPLY"
@@ -302,7 +283,6 @@
       project: "{{ project_id }}"
       playbook: "playbooks/terraform_apply_plan.yml"
       execution_environment: "{{ ee_id }}"
-      extra_vars: "aws_region: us-east-2\naws_name_tag: tfevm\naws_instance_size: t2.micro\naws_instance_count: 1"
     status_code: [200, 201]
   register: r_jt_apply_create
   when: r_jt_apply_check.json.count == 0
@@ -311,7 +291,7 @@
   ansible.builtin.set_fact:
     jt_apply_id: "{{ r_jt_apply_create.json.id if r_jt_apply_check.json.count == 0 else r_jt_apply_check.json.results[0].id }}"
 
-- name: Add TFE credential to APPLY job template
+- name: Add TFE credential to APPLY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/job_templates/{{ jt_apply_id }}/credentials/"
     method: POST
@@ -326,10 +306,7 @@
   when: r_jt_apply_check.json.count == 0
   ignore_errors: true
 
-# -------------------------------------------------------------------
-# Step 7: Job Template — Terraform Enterprise DESTROY
-# -------------------------------------------------------------------
-
+# Job Template — DESTROY
 - name: Check DESTROY job template exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+DESTROY"
@@ -364,7 +341,7 @@
   ansible.builtin.set_fact:
     jt_destroy_id: "{{ r_jt_destroy_create.json.id if r_jt_destroy_check.json.count == 0 else r_jt_destroy_check.json.results[0].id }}"
 
-- name: Add TFE credential to DESTROY job template
+- name: Add TFE credential to DESTROY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/job_templates/{{ jt_destroy_id }}/credentials/"
     method: POST
@@ -379,11 +356,8 @@
   when: r_jt_destroy_check.json.count == 0
   ignore_errors: true
 
-# -------------------------------------------------------------------
-# Step 8: Workflow — WF-Terraform Enterprise APPLY
-# -------------------------------------------------------------------
-
-- name: Check WF-APPLY workflow exists
+# Workflow — WF-Terraform Enterprise APPLY
+- name: Check WF-APPLY exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+APPLY"
     user: "{{ aap_username }}"
@@ -392,7 +366,7 @@
     validate_certs: false
   register: r_wf_apply_check
 
-- name: Create WF-APPLY workflow
+- name: Create WF-APPLY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/"
     method: POST
@@ -412,7 +386,7 @@
   ansible.builtin.set_fact:
     wf_apply_id: "{{ r_wf_apply_create.json.id if r_wf_apply_check.json.count == 0 else r_wf_apply_check.json.results[0].id }}"
 
-- name: Create APPLY node in WF-APPLY
+- name: Create APPLY node
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
     method: POST
@@ -497,11 +471,8 @@
     - r_node_nginx is defined
     - nginx_jt_id | int > 0
 
-# -------------------------------------------------------------------
-# Step 9: Workflow — WF-Terraform Enterprise DESTROY
-# -------------------------------------------------------------------
-
-- name: Check WF-DESTROY workflow exists
+# Workflow — WF-Terraform Enterprise DESTROY
+- name: Check WF-DESTROY exists
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+DESTROY"
     user: "{{ aap_username }}"
@@ -510,7 +481,7 @@
     validate_certs: false
   register: r_wf_destroy_check
 
-- name: Create WF-DESTROY workflow
+- name: Create WF-DESTROY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/"
     method: POST
@@ -530,7 +501,7 @@
   ansible.builtin.set_fact:
     wf_destroy_id: "{{ r_wf_destroy_create.json.id if r_wf_destroy_check.json.count == 0 else r_wf_destroy_check.json.results[0].id }}"
 
-- name: Create DESTROY node in WF-DESTROY
+- name: Create DESTROY node
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
     method: POST
@@ -579,10 +550,7 @@
     - r_node_destroy is defined
     - r_node_destroy_inv is defined
 
-# -------------------------------------------------------------------
 # Write output
-# -------------------------------------------------------------------
-
 - name: Write solve summary
   ansible.builtin.copy:
     content: |
