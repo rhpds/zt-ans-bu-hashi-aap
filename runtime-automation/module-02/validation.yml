@@ -116,17 +116,17 @@
       Module 2 Validation Results
       ============================
       Vault:
-      {{ '\u2714' if vault_kv_ok | default(false) | bool else '\u2718' }} KV secrets engine at 'secret'
-      {{ '\u2714' if vault_secret_ok | default(false) | bool else '\u2718' }} Secret 'aws_creds' created
-      {{ '\u2714' if vault_policy_ok | default(false) | bool else '\u2718' }} Policy 'aap-terraform-policy'
-      {{ '\u2714' if vault_approle_ok | default(false) | bool else '\u2718' }} AppRole auth method enabled
-      {{ '\u2714' if vault_role_ok | default(false) | bool else '\u2718' }} AppRole role 'aapterraform'
+      {{ '[OK]' if vault_kv_ok | default(false) | bool else '[X] ' }} KV secrets engine at 'secret'
+      {{ '[OK]' if vault_secret_ok | default(false) | bool else '[X] ' }} Secret 'aws_creds' created
+      {{ '[OK]' if vault_policy_ok | default(false) | bool else '[X] ' }} Policy 'aap-terraform-policy'
+      {{ '[OK]' if vault_approle_ok | default(false) | bool else '[X] ' }} AppRole auth method enabled
+      {{ '[OK]' if vault_role_ok | default(false) | bool else '[X] ' }} AppRole role 'aapterraform'
 
       AAP:
-      {{ '\u2714' if r_vault_cred.json.count > 0 else '\u2718' }} Vault lookup credential
-      {{ '\u2714' if r_ssh_cred.json.count > 0 else '\u2718' }} Vault MACHINE SSH credential
-      {{ '\u2714' if r_jt_tfe_vcs.json.count > 0 else '\u2718' }} Job template: Install Nginx on RHEL - TFE-VCS
-      {{ '\u2714' if r_wf_tfe.json.count > 0 else '\u2718' }} Workflow: WF-Launched by TFE
+      {{ '[OK]' if r_vault_cred.json.count > 0 else '[X] ' }} Vault lookup credential
+      {{ '[OK]' if r_ssh_cred.json.count > 0 else '[X] ' }} Vault MACHINE SSH credential
+      {{ '[OK]' if r_jt_tfe_vcs.json.count > 0 else '[X] ' }} Job template: Install Nginx on RHEL - TFE-VCS
+      {{ '[OK]' if r_wf_tfe.json.count > 0 else '[X] ' }} Workflow: WF-Launched by TFE
     validation_passed: >-
       {{ (vault_kv_ok | default(false) | bool)
          and (vault_secret_ok | default(false) | bool)
@@ -146,7 +146,8 @@
   delegate_to: localhost
   when:
     - job_info_dir is defined
-    - not validation_passed | default(false) | bool
+    - not validation_passed | bool
+    - not validation_passed | bool
 
 - name: Fail if validation did not pass
   ansible.builtin.fail:
