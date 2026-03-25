@@ -233,7 +233,7 @@
     tfe_cred_id: "{{ r_cred_create.json.id if r_cred_check.json.count == 0 else r_cred_check.json.results[0].id }}"
 
 # -------------------------------------------------------------------
-# Step 5: Inventory Source (AWS source for TFE resources)
+# Step 5: Inventory Source
 # -------------------------------------------------------------------
 
 - name: Check inventory source exists
@@ -302,11 +302,7 @@
       project: "{{ project_id }}"
       playbook: "playbooks/terraform_apply_plan.yml"
       execution_environment: "{{ ee_id }}"
-      extra_vars:
-        aws_region: us-east-2
-        aws_name_tag: tfevm
-        aws_instance_size: t2.micro
-        aws_instance_count: 1
+      extra_vars: "aws_region: us-east-2\naws_name_tag: tfevm\naws_instance_size: t2.micro\naws_instance_count: 1"
     status_code: [200, 201]
   register: r_jt_apply_create
   when: r_jt_apply_check.json.count == 0
@@ -384,7 +380,7 @@
   ignore_errors: true
 
 # -------------------------------------------------------------------
-# Step 8: Workflow — WF-Terraform Enterprise APPLY (with nodes)
+# Step 8: Workflow — WF-Terraform Enterprise APPLY
 # -------------------------------------------------------------------
 
 - name: Check WF-APPLY workflow exists
@@ -412,7 +408,7 @@
   register: r_wf_apply_create
   when: r_wf_apply_check.json.count == 0
 
-- name: Set WF-APPLY workflow ID
+- name: Set WF-APPLY ID
   ansible.builtin.set_fact:
     wf_apply_id: "{{ r_wf_apply_create.json.id if r_wf_apply_check.json.count == 0 else r_wf_apply_check.json.results[0].id }}"
 
@@ -429,10 +425,10 @@
       workflow_job_template: "{{ wf_apply_id }}"
       unified_job_template: "{{ jt_apply_id }}"
     status_code: [200, 201]
-  register: r_wf_apply_node1
+  register: r_node_apply
   when: r_wf_apply_check.json.count == 0
 
-- name: Create inventory sync node in WF-APPLY
+- name: Create inv sync node in WF-APPLY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
     method: POST
@@ -445,10 +441,10 @@
       workflow_job_template: "{{ wf_apply_id }}"
       unified_job_template: "{{ inv_source_id }}"
     status_code: [200, 201]
-  register: r_wf_apply_node2
+  register: r_node_inv
   when: r_wf_apply_check.json.count == 0
 
-- name: Create nginx install node in WF-APPLY
+- name: Create nginx node in WF-APPLY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
     method: POST
@@ -461,14 +457,14 @@
       workflow_job_template: "{{ wf_apply_id }}"
       unified_job_template: "{{ nginx_jt_id }}"
     status_code: [200, 201]
-  register: r_wf_apply_node3
+  register: r_node_nginx
   when:
     - r_wf_apply_check.json.count == 0
     - nginx_jt_id | int > 0
 
-- name: Link APPLY → inventory sync (success)
+- name: Link apply → inv sync
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_wf_apply_node1.json.id }}/success_nodes/"
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_node_apply.json.id }}/success_nodes/"
     method: POST
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
@@ -476,16 +472,16 @@
     validate_certs: false
     body_format: json
     body:
-      id: "{{ r_wf_apply_node2.json.id }}"
+      id: "{{ r_node_inv.json.id }}"
     status_code: [200, 204]
   when:
     - r_wf_apply_check.json.count == 0
-    - r_wf_apply_node1 is defined
-    - r_wf_apply_node2 is defined
+    - r_node_apply is defined
+    - r_node_inv is defined
 
-- name: Link inventory sync → nginx install (success)
+- name: Link inv sync → nginx
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_wf_apply_node2.json.id }}/success_nodes/"
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_node_inv.json.id }}/success_nodes/"
     method: POST
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
@@ -493,16 +489,16 @@
     validate_certs: false
     body_format: json
     body:
-      id: "{{ r_wf_apply_node3.json.id }}"
+      id: "{{ r_node_nginx.json.id }}"
     status_code: [200, 204]
   when:
     - r_wf_apply_check.json.count == 0
-    - r_wf_apply_node2 is defined
-    - r_wf_apply_node3 is defined
+    - r_node_inv is defined
+    - r_node_nginx is defined
     - nginx_jt_id | int > 0
 
 # -------------------------------------------------------------------
-# Step 9: Workflow — WF-Terraform Enterprise DESTROY (with nodes)
+# Step 9: Workflow — WF-Terraform Enterprise DESTROY
 # -------------------------------------------------------------------
 
 - name: Check WF-DESTROY workflow exists
@@ -530,7 +526,7 @@
   register: r_wf_destroy_create
   when: r_wf_destroy_check.json.count == 0
 
-- name: Set WF-DESTROY workflow ID
+- name: Set WF-DESTROY ID
   ansible.builtin.set_fact:
     wf_destroy_id: "{{ r_wf_destroy_create.json.id if r_wf_destroy_check.json.count == 0 else r_wf_destroy_check.json.results[0].id }}"
 
@@ -547,10 +543,10 @@
       workflow_job_template: "{{ wf_destroy_id }}"
       unified_job_template: "{{ jt_destroy_id }}"
     status_code: [200, 201]
-  register: r_wf_destroy_node1
+  register: r_node_destroy
   when: r_wf_destroy_check.json.count == 0
 
-- name: Create inventory sync node in WF-DESTROY
+- name: Create inv sync node in WF-DESTROY
   ansible.builtin.uri:
     url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
     method: POST
@@ -563,12 +559,12 @@
       workflow_job_template: "{{ wf_destroy_id }}"
       unified_job_template: "{{ inv_source_id }}"
     status_code: [200, 201]
-  register: r_wf_destroy_node2
+  register: r_node_destroy_inv
   when: r_wf_destroy_check.json.count == 0
 
-- name: Link DESTROY → inventory sync (success)
+- name: Link destroy → inv sync
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_wf_destroy_node1.json.id }}/success_nodes/"
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_node_destroy.json.id }}/success_nodes/"
     method: POST
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
@@ -576,12 +572,12 @@
     validate_certs: false
     body_format: json
     body:
-      id: "{{ r_wf_destroy_node2.json.id }}"
+      id: "{{ r_node_destroy_inv.json.id }}"
     status_code: [200, 204]
   when:
     - r_wf_destroy_check.json.count == 0
-    - r_wf_destroy_node1 is defined
-    - r_wf_destroy_node2 is defined
+    - r_node_destroy is defined
+    - r_node_destroy_inv is defined
 
 # -------------------------------------------------------------------
 # Write output
