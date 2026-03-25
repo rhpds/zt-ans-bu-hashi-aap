@@ -298,8 +298,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ tfe_cred_id | int }}"
+    body: "{{ {'id': tfe_cred_id | int} }}"
     status_code: [200, 204]
   when: r_jt_apply_check.json.count == 0
   ignore_errors: true
@@ -348,8 +347,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ tfe_cred_id | int }}"
+    body: "{{ {'id': tfe_cred_id | int} }}"
     status_code: [200, 204]
   when: r_jt_destroy_check.json.count == 0
   ignore_errors: true
@@ -443,8 +441,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ r_node_inv.json.id | int }}"
+    body: "{{ {'id': r_node_inv.json.id | int} }}"
     status_code: [200, 204]
   when:
     - r_wf_apply_check.json.count == 0
@@ -460,8 +457,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ r_node_nginx.json.id | int }}"
+    body: "{{ {'id': r_node_nginx.json.id | int} }}"
     status_code: [200, 204]
   when:
     - r_wf_apply_check.json.count == 0
@@ -540,8 +536,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ r_node_destroy_inv.json.id | int }}"
+    body: "{{ {'id': r_node_destroy_inv.json.id | int} }}"
     status_code: [200, 204]
   when:
     - r_wf_destroy_check.json.count == 0
