@@ -9,15 +9,13 @@
     aap_host: "https://control-https"
     aap_username: "admin"
     aap_password: "ansible123!"
-    tfe_host: "https://tfe-https"
-    tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') }}"
+    tfe_host: "https://tfe-https-${guid}.${domain}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
 
   tasks:
     - name: Load secrets if available
       ansible.builtin.include_vars: ../config/secrets.yaml
-      ignore_errors: true
 
     - name: Include module tasks
       ansible.builtin.include_tasks: "{{ _module_dir }}/{{ module_stage }}.yml"
