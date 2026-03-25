@@ -3,7 +3,7 @@
 
 - name: Login to Vault via userpass
   ansible.builtin.uri:
-    url: "https://vault-https/v1/auth/userpass/login/admin"
+    url: "http://vault:8200/v1/auth/userpass/login/admin"
     method: POST
     validate_certs: false
     body_format: json
@@ -15,7 +15,7 @@
 - name: Set Vault token and URL
   ansible.builtin.set_fact:
     vault_token: "{{ r_vault_login.json.auth.client_token | default('') }}"
-    vault_url: "https://vault-https"
+    vault_url: "http://vault:8200"
 
 - name: Check Vault KV secrets engine at 'secret'
   ansible.builtin.uri:
