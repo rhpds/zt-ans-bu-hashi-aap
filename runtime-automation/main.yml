@@ -4,12 +4,11 @@
   connection: local
   gather_facts: false
 
-  vars_files:
-    - ../config/secrets.yaml
-
   vars:
     guid: "{{ lookup('env', 'GUID') }}"
     domain: "{{ lookup('env', 'DOMAIN') }}"
+    # Support both variable names — jobs.py sends module_directory, older configs use module_dir
+    _module_dir: "{{ module_dir | default(module_directory | default('')) }}"
     aap_host: "https://control-{{ lookup('env', 'GUID') }}.{{ lookup('env', 'DOMAIN') }}"
     aap_username: "{{ aap_admin_username | default('admin') }}"
     aap_password: "{{ aap_admin_password | default('ansible123!') }}"
@@ -19,5 +18,9 @@
     tfe_workspace_name: TFE-Demo
 
   tasks:
+    - name: Load secrets if available
+      ansible.builtin.include_vars: ../config/secrets.yaml
+      ignore_errors: true
+
     - name: Include module tasks
-      ansible.builtin.include_tasks: "{{ module_dir }}/{{ module_stage }}.yml"
+      ansible.builtin.include_tasks: "{{ _module_dir }}/{{ module_stage }}.yml"
