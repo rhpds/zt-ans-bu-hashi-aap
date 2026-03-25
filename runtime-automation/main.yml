@@ -5,11 +5,14 @@
   gather_facts: false
 
   vars:
+    guid: "{{ lookup('ansible.builtin.env', 'GUID') }}"
+    domain: "{{ lookup('ansible.builtin.env', 'DOMAIN') }}"
+    aws_access_key: "{{ lookup('ansible.builtin.env', 'AWS_ACCESS_KEY_ID') | default('AWS_ACCESS_KEY_ID_NOT_FOUND', true) }}"
     _module_dir: "{{ module_dir | default(module_directory | default('')) }}"
     aap_host: "https://control-https"
     aap_username: "admin"
     aap_password: "ansible123!"
-    tfe_host: "https://tfe-https-${guid}.${domain}"
+    tfe_host: "https://tfe-https-{{ guid }}.{{ domain }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
 
