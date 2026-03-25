@@ -1,6 +1,5 @@
 ---
 # Validate Module 01 - AAP + Terraform Enterprise
-# Called by nookbag when user clicks Next (stage: validation)
 
 - name: Check TFE credential type exists
   ansible.builtin.uri:
@@ -75,6 +74,12 @@
     status_code: [200, 404]
   register: r_tfe_workspace
   when: tfe_api_token | default('') | length > 0
+  ignore_errors: true
+
+# Pre-compute as boolean to avoid .status access failure on skipped task
+- name: Set TFE workspace fact
+  ansible.builtin.set_fact:
+    tfe_workspace_ok: "{{ r_tfe_workspace.status | default(404) == 200 }}"
 
 - name: Build validation results
   ansible.builtin.set_fact:
@@ -88,7 +93,7 @@
       {{ '\u2714' if r_jt_destroy.json.count > 0 else '\u2718' }} Job template: Terraform Enterprise DESTROY
       {{ '\u2714' if r_wf_apply.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise APPLY
       {{ '\u2714' if r_wf_destroy.json.count > 0 else '\u2718' }} Workflow: WF-Terraform Enterprise DESTROY
-      {{ '\u2714' if (r_tfe_workspace is defined and r_tfe_workspace.status == 200) else '\u2718' }} TFE workspace: {{ tfe_workspace_name }}
+      {{ '\u2714' if tfe_workspace_ok | bool else '\u2718' }} TFE workspace: {{ tfe_workspace_name }}
     validation_passed: >-
       {{ r_cred_type.json.count > 0
          and r_credential.json.count > 0
@@ -98,7 +103,7 @@
          and r_wf_apply.json.count > 0
          and r_wf_destroy.json.count > 0 }}
 
-- name: Write failure output to validation_failure.out
+- name: Write failure details to validation_failure.out
   ansible.builtin.copy:
     content: "{{ validation_output }}"
     dest: "{{ job_info_dir }}/validation_failure.out"
