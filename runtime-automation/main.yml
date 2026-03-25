@@ -7,11 +7,11 @@
   vars:
     guid: "{{ lookup('env', 'GUID') }}"
     domain: "{{ lookup('env', 'DOMAIN') }}"
-    # Use internal Kubernetes service IPs — reliable from within the pod
-    aap_host: "https://{{ lookup('env', 'CONTROL_HTTPS_SERVICE_HOST') }}"
+    # Use Kubernetes service DNS names — stable, no hardcoded IPs
+    aap_host: "https://control-https"
     aap_username: "admin"
     aap_password: "ansible123!"
-    tfe_host: "https://{{ lookup('env', 'TFE_HTTPS_SERVICE_HOST') }}"
+    tfe_host: "https://tfe-https"
     tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
