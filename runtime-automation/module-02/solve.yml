@@ -327,8 +327,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ r_vault_lookup_cred.json.results[0].id }}"
+    body: "{{ {'id': r_vault_lookup_cred.json.results[0].id | int} }}"
     status_code: [200, 204]
   when: r_jt_tfe_check.json.count == 0
 
@@ -418,8 +417,7 @@
     force_basic_auth: true
     validate_certs: false
     body_format: json
-    body:
-      id: "{{ r_node2.json.id }}"
+    body: "{{ {'id': r_node2.json.id | int} }}"
     status_code: [200, 204]
   when:
     - r_wf_check.json.count == 0
