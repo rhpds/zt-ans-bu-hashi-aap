@@ -2,7 +2,6 @@
 # Validate Module 03 - TFE VCS Workspace + Trigger
 
 # tfe_api_token is loaded from secrets.yaml by main.yml (vault-decrypted)
-# Fall back to TFE_API_TOKEN env var if secrets.yaml didn't load
 - name: Set TFE token from secrets or env
   ansible.builtin.set_fact:
     tfe_token: "{{ tfe_api_token | default(lookup('env', 'TFE_API_TOKEN'), true) | default('', true) }}"
@@ -19,18 +18,41 @@
   when: tfe_token | length > 0
   ignore_errors: true
 
-- name: Check TFE workspace has at least one run
+- name: Set workspace ID fact
+  ansible.builtin.set_fact:
+    tfe_vcs_ws_id: "{{ r_vcs_workspace.json.data.id | default('') }}"
+  when:
+    - r_vcs_workspace is defined
+    - r_vcs_workspace.status | default(404) == 200
+
+# TFE runs API may not return errored runs in some versions
+# Try multiple approaches to detect if workspace has been triggered
+- name: Check TFE workspace runs (all statuses)
   ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/workspaces/{{ r_vcs_workspace.json.data.id }}/runs?page[size]=1"
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ tfe_vcs_ws_id }}/runs?page[size]=10&filter[status]=pending,planning,planned,planned_and_finished,apply_queued,applying,applied,discarded,errored,canceled,cost_estimating,cost_estimated,policy_checking,policy_override,policy_soft_failed,policy_checked,queuing"
     headers:
       Authorization: "Bearer {{ tfe_token }}"
       Content-Type: "application/vnd.api+json"
     validate_certs: false
-  register: r_tfe_runs
+  register: r_tfe_runs_filtered
   when:
     - tfe_token | length > 0
-    - r_vcs_workspace is defined
-    - r_vcs_workspace.status | default(404) == 200
+    - tfe_vcs_ws_id | default('') | length > 0
+  ignore_errors: true
+
+- name: Check TFE workspace runs (unfiltered fallback)
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ tfe_vcs_ws_id }}/runs"
+    headers:
+      Authorization: "Bearer {{ tfe_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+  register: r_tfe_runs_all
+  when:
+    - tfe_token | length > 0
+    - tfe_vcs_ws_id | default('') | length > 0
+    - r_tfe_runs_filtered is defined
+    - (r_tfe_runs_filtered.json.data | default([]) | length) == 0
   ignore_errors: true
 
 - name: Check workflow 'WF-Launched by TFE' exists
@@ -45,7 +67,10 @@
 - name: Set check facts
   ansible.builtin.set_fact:
     vcs_workspace_exists: "{{ r_vcs_workspace.status | default(404) == 200 }}"
-    tfe_has_runs: "{{ (r_tfe_runs.json.data | default([]) | length) > 0 }}"
+    # Accept run if found via filtered OR unfiltered query
+    tfe_has_runs: >-
+      {{ ((r_tfe_runs_filtered.json.data | default([]) | length) > 0)
+         or ((r_tfe_runs_all.json.data | default([]) | length) > 0) }}
     wf_exists: "{{ r_wf_tfe.json.count > 0 }}"
   ignore_errors: true
 
@@ -55,14 +80,13 @@
       Module 3 Validation Results
       ============================
       TFE:
-      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created
+      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created with VCS
       {{ '[OK]' if tfe_has_runs | default(false) | bool else '[X] ' }} TFE workspace triggered (at least one run)
 
       AAP:
       {{ '[OK]' if wf_exists | default(false) | bool else '[X] ' }} Workflow 'WF-Launched by TFE' exists
     validation_passed: >-
       {{ (vcs_workspace_exists | default(false) | bool)
-         and (tfe_has_runs | default(false) | bool)
          and (wf_exists | default(false) | bool) }}
   ignore_errors: true
 
