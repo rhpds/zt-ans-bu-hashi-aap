@@ -10,12 +10,12 @@
     aap_username: "admin"
     aap_password: "ansible123!"
     tfe_host: "https://tfe-https"
-    tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') | default(tfe_api_token | default(''), true) }}"
+    tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('', true) }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
 
   tasks:
-    - name: Load secrets (auto-decrypted via VAULT_PASSWORD env var)
+    - name: Load secrets (vault-decrypted via VAULT_PASSWORD env var — sets tfe_api_token)
       ansible.builtin.include_vars: secrets.yaml
       ignore_errors: true
 
