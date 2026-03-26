@@ -121,32 +121,34 @@
 # Write output with GitHub manual steps
 # -------------------------------------------------------------------
 
-- name: Write solve summary
+- name: Write GitHub steps to output
   ansible.builtin.copy:
     content: |
-      Module 3 AAP Setup Complete
-      ===========================
-      [OK] WF-Launched by TFE workflow is configured in AAP
+      [OK] WF-Launched by TFE is configured in AAP
 
-      The following steps require your personal GitHub account
-      and must be completed manually:
+      Complete these GitHub steps manually before clicking Next:
 
-      1. Import repository to your GitHub account:
-         https://github.com/ansible-tmm/aap-hashi-lab-2.git
+      1. Import to your GitHub: https://github.com/ansible-tmm/aap-hashi-lab-2.git
 
-      2. In Terraform Enterprise, create a new workspace using
-         Version Control Workflow and connect to your GitHub repo
+      2. In TFE: New workspace > Version Control Workflow
+         Connect to your imported GitHub repo
+         Workspace name: TFE-Demo-VCS
 
-      3. Set workspace name to: TFE-Demo-VCS
+      3. Add workspace variables:
+         aap_host, aap_username, aap_password
+         vault_addr, vault_role_id, vault_secret_id
+         aws_access_key, aws_secret_key
 
-      4. Configure workspace variables (aap_host, vault_addr,
-         aws_access_key, aws_secret_key, vault_role_id, vault_secret_id)
+      4. Disable SSL on the GitHub webhook
 
-      5. Disable SSL verification on the GitHub webhook
+      5. Commit to TF_templates/AWS/terraform.tfvars:
+         change instance_count = 0 to instance_count = 2
 
-      6. Commit a change to terraform.tfvars to trigger the run
-
-      Once a TFE run completes successfully, click Next to validate.
-    dest: "{{ job_info_dir }}/script.out"
+      Once TFE runs and AAP workflow completes > click Next to validate.
+    dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
   when: job_info_dir is defined
+
+- name: Show GitHub steps to complete
+  ansible.builtin.fail:
+    msg: "AAP setup done. Complete the GitHub steps shown above, then click Next."
