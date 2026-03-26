@@ -342,9 +342,37 @@
     - r_jt_tfe_check.json.count == 0
     - r_vault_ssh_cred_lookup.json.count > 0
 
+- name: Get current Vault lookup credential ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+lookup+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_lookup_current
+
+- name: Get current Vault MACHINE SSH credential ID
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Vault+MACHINE+SSH+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_vault_ssh_current
+
+- name: Check existing input sources on Vault MACHINE SSH credential
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/{{ r_vault_ssh_current.json.results[0].id | int }}/input_sources/"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_input_sources_check
+  when: r_vault_ssh_current.json.count > 0
+
 - name: Link SSH key in Vault MACHINE SSH credential to Vault secret
   ansible.builtin.uri:
-    url: "{{ aap_host }}/api/controller/v2/credentials/{{ r_ssh_cred_create.json.id | default(r_ssh_cred_check.json.results[0].id) }}/input_sources/"
+    url: "{{ aap_host }}/api/controller/v2/credentials/{{ r_vault_ssh_current.json.results[0].id | int }}/input_sources/"
     method: POST
     user: "{{ aap_username }}"
     password: "{{ aap_password }}"
@@ -353,14 +381,17 @@
     body_format: json
     body:
       input_field_name: ssh_key_data
-      source_credential: "{{ r_vault_cred_check.json.results[0].id | default(r_vault_cred_lookup.json.results[0].id) | int }}"
+      source_credential: "{{ r_vault_lookup_current.json.results[0].id | int }}"
       metadata:
         secret_backend: secret
         secret_path: rhel-server/ssh-keys/latest
         secret_key: private_key
         auth_path: approle
     status_code: [200, 201]
-  when: r_ssh_cred_check.json.count == 0
+  when:
+    - r_vault_ssh_current.json.count > 0
+    - r_vault_lookup_current.json.count > 0
+    - r_input_sources_check.json.count == 0
   ignore_errors: true
 
 # -------------------------------------------------------------------
