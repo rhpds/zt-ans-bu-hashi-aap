@@ -150,6 +150,24 @@ image::workspace10.png[link=self, window=blank, width=100%]
 
 * On the next screen, add the following `Terraform variables`:
 
+[NOTE]
+====
+**Where to find your values:**
+
+* **AWS Access Key / Secret Key** — Click the `Cloud (AWS)` tab at the top of this lab. Your AWS credentials are displayed there.
+
+* **vault_role_id / vault_secret_id** — These were generated in Module 2 when you created the AppRole. If you need to retrieve them again, open the `Terminal` tab and run:
++
+[source,bash,role=execute]
+----
+ssh rhel@vault
+export VAULT_ADDR=http://127.0.0.1:8200
+vault login -address=http://127.0.0.1:8200 -method=userpass username=admin password=ansible123!
+vault read auth/approle/role/aapterraform/role-id
+vault write -f auth/approle/role/aapterraform/secret-id
+----
+====
+
 |===
 | Key | Value | Sensitive
 
@@ -167,11 +185,11 @@ image::workspace10.png[link=self, window=blank, width=100%]
 | Yes
 
 | aws_access_key
-| <your aws access key id>
+| **From the `Cloud (AWS)` tab in your lab**
 | No
 
 | aws_secret_key
-| <your aws secret access key>
+| **From the `Cloud (AWS)` tab in your lab**
 | Yes
 
 | aws_region
@@ -184,11 +202,11 @@ image::workspace10.png[link=self, window=blank, width=100%]
 | No
 
 | vault_role_id
-| <your vault role id>
+| **From the Terminal — see note above**
 | No
 
 | vault_secret_id
-| <your vault secret id>
+| **From the Terminal — see note above**
 | Yes
 |===
 
