@@ -119,11 +119,14 @@
 
 # -------------------------------------------------------------------
 # Write output with GitHub manual steps
+# [INFO] prefix = shows as blue "Action Required" dialog (nookbag PR#57)
+# Without PR merged = shows as "Validation Error" with same content
 # -------------------------------------------------------------------
 
 - name: Write GitHub steps to output
   ansible.builtin.copy:
     content: |
+      [INFO]
       [OK] WF-Launched by TFE is configured in AAP
 
       Complete these GitHub steps manually before clicking Next:
