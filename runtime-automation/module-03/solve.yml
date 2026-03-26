@@ -1,11 +1,10 @@
 ---
-# Solve Module 03 - AAP work only
-# The WF-Launched by TFE workflow in AAP is the only automation possible here.
-# GitHub VCS connection, OAuth app, webhook, and commit steps require
-# the attendee's personal GitHub account and cannot be automated.
+# Solve Module 03 - Two-step approach
+# Step 1: Run Solve to set up AAP + see GitHub steps
+# Step 2: Do GitHub steps manually, then run Solve again to confirm
 
 # -------------------------------------------------------------------
-# Ensure WF-Launched by TFE exists in AAP (idempotent with module-02)
+# Always ensure WF-Launched by TFE exists in AAP (idempotent)
 # -------------------------------------------------------------------
 
 - name: Get Default org ID
@@ -118,18 +117,60 @@
     - r_node2 is defined
 
 # -------------------------------------------------------------------
-# Write output with GitHub manual steps
-# [INFO] prefix = shows as blue "Action Required" dialog (nookbag PR#57)
-# Without PR merged = shows as "Validation Error" with same content
+# Check if GitHub steps have been completed (TFE-Demo-VCS exists)
 # -------------------------------------------------------------------
 
-- name: Write GitHub steps to output
+- name: Check if TFE-Demo-VCS workspace already exists
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces/TFE-Demo-VCS"
+    headers:
+      Authorization: "Bearer {{ tfe_api_token | default('') }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_vcs_workspace
+  when: tfe_api_token | default('') | length > 0
+  ignore_errors: true
+
+- name: Set workspace status fact
+  ansible.builtin.set_fact:
+    vcs_workspace_done: "{{ r_vcs_workspace.status | default(404) == 200 }}"
+
+# -------------------------------------------------------------------
+# Step 2: GitHub steps done — workspace exists, show completion
+# -------------------------------------------------------------------
+
+- name: Show completion message (GitHub steps done)
+  ansible.builtin.copy:
+    content: |
+      [INFO]
+      [OK] WF-Launched by TFE is configured in AAP
+      [OK] TFE-Demo-VCS workspace detected
+
+      AAP and TFE setup is complete!
+      Click Next to validate module 3.
+    dest: "{{ job_info_dir }}/validation_failure.out"
+  delegate_to: localhost
+  when:
+    - job_info_dir is defined
+    - vcs_workspace_done | bool
+
+- name: Succeed when workspace exists
+  ansible.builtin.debug:
+    msg: "Module 3 setup complete — workspace exists and AAP is configured."
+  when: vcs_workspace_done | bool
+
+# -------------------------------------------------------------------
+# Step 1: GitHub steps not done yet — show instructions and stop
+# -------------------------------------------------------------------
+
+- name: Show GitHub steps (first solve run)
   ansible.builtin.copy:
     content: |
       [INFO]
       [OK] WF-Launched by TFE is configured in AAP
 
-      Complete these GitHub steps manually before clicking Next:
+      Now complete these GitHub steps, then run Solve again:
 
       1. Import to your GitHub: https://github.com/ansible-tmm/aap-hashi-lab-2.git
 
@@ -140,18 +181,18 @@
       3. Add workspace variables:
          aap_host, aap_username, aap_password
          vault_addr, vault_role_id, vault_secret_id
-         aws_access_key, aws_secret_key
+         aws_access_key, aws_secret_key, aws_region (us-east-2)
 
       4. Disable SSL on the GitHub webhook
 
-      5. Commit to TF_templates/AWS/terraform.tfvars:
-         change instance_count = 0 to instance_count = 2
-
-      Once TFE runs and AAP workflow completes > click Next to validate.
+      5. Run Solve again to confirm setup is complete.
     dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
-  when: job_info_dir is defined
+  when:
+    - job_info_dir is defined
+    - not vcs_workspace_done | bool
 
-- name: Show GitHub steps to complete
+- name: Prompt to complete GitHub steps
   ansible.builtin.fail:
-    msg: "AAP setup done. Complete the GitHub steps shown above, then click Next."
+    msg: "Complete the GitHub steps shown above, then run Solve again."
+  when: not vcs_workspace_done | bool
