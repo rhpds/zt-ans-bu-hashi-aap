@@ -1,9 +1,11 @@
 ---
 # Validate Module 03 - TFE VCS Workspace + Trigger
 
-- name: Set TFE token
+# tfe_api_token is loaded from secrets.yaml by main.yml (vault-decrypted)
+# Fall back to TFE_API_TOKEN env var if secrets.yaml didn't load
+- name: Set TFE token from secrets or env
   ansible.builtin.set_fact:
-    tfe_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('') }}"
+    tfe_token: "{{ tfe_api_token | default(lookup('env', 'TFE_API_TOKEN'), true) | default('', true) }}"
 
 - name: Check TFE workspace TFE-Demo-VCS exists
   ansible.builtin.uri:
@@ -71,7 +73,6 @@
   delegate_to: localhost
   when:
     - job_info_dir is defined
-    - not validation_passed | bool
     - not validation_passed | bool
 
 - name: Fail if validation did not pass
