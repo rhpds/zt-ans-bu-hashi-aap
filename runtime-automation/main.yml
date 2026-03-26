@@ -6,10 +6,13 @@
 
   vars:
     _module_dir: "{{ module_dir | default(module_directory | default('')) }}"
+    _guid: "{{ lookup('env', 'GUID') }}"
+    _domain: "{{ lookup('env', 'DOMAIN') }}"
     aap_host: "https://control-https"
     aap_username: "admin"
     aap_password: "ansible123!"
-    tfe_host: "https://tfe-https"
+    # Use full FQDN for TFE — bare service name returns 301 redirect on POST
+    tfe_host: "{{ 'https://tfe-https-' + _guid + '.' + _domain if _guid else 'https://tfe-https' }}"
     tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('', true) }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
