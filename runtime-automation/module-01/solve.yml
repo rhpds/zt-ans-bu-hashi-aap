@@ -52,7 +52,7 @@
               id: "{{ tfe_project_id }}"
     validate_certs: false
     status_code: [200, 201]
-    register: r_ws_create
+  register: r_ws_create
   when:
     - tfe_api_token | default('') | length > 0
     - r_ws_check.status == 404
