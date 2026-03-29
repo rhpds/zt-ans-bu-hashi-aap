@@ -16,8 +16,8 @@
     tfe_api_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('', true) }}"
     tfe_org: rhdp-tf-org
     tfe_workspace_name: TFE-Demo
-    # aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('', true) }}"
-    # aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('', true) }}"
+    aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('', true) }}"
+    aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('', true) }}"
     # aws_default_region: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('us-east-2', true) }}"
   tasks:
     - name: Load secrets (vault-decrypted via VAULT_PASSWORD env var — sets tfe_api_token)
