@@ -85,6 +85,7 @@
       sensitive: true
   when:
     - r_ws_create is defined
+    - r_ws_create is not skipped
     - r_ws_create.status in [200, 201]
 
 # Step 2: Get prerequisite IDs from AAP
