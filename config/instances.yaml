@@ -67,7 +67,6 @@
 virtualmachines:
   - name: control
     image: aap-2.6-6-ceh-20260325
-    # image: aap-2.6-2-ceh-20251103
     memory: 32G
     cores: 4
     image_size: 50Gi
@@ -105,38 +104,38 @@ virtualmachines:
         tls_termination: reencrypt
         tls_destinationCACertificate: |
           -----BEGIN CERTIFICATE-----
-          MIIF1jCCA76gAwIBAgIUASi34Lss1upPyAS1YsA8eZTJOFAwDQYJKoZIhvcNAQEL
+          MIIF1jCCA76gAwIBAgIUDDMiIDzSJRTuX95rAge4OUEro48wDQYJKoZIhvcNAQEL
           BQAwgYIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIDA5Ob3J0aCBDYXJvbGluYTEQMA4G
           A1UEBwwHUmFsZWlnaDEQMA4GA1UECgwHUmVkIEhhdDEQMA4GA1UECwwHQW5zaWJs
-          ZTEkMCIGA1UEAwwbQW5zaWJsZSBBdXRvbWF0aW9uIFBsYXRmb3JtMB4XDTI1MTEw
-          MzE5NDkyNVoXDTM1MTEwMTE5NDkyNVowgYIxCzAJBgNVBAYTAlVTMRcwFQYDVQQI
+          ZTEkMCIGA1UEAwwbQW5zaWJsZSBBdXRvbWF0aW9uIFBsYXRmb3JtMB4XDTI2MDMy
+          NTIxNDIxMFoXDTM2MDMyMjIxNDIxMFowgYIxCzAJBgNVBAYTAlVTMRcwFQYDVQQI
           DA5Ob3J0aCBDYXJvbGluYTEQMA4GA1UEBwwHUmFsZWlnaDEQMA4GA1UECgwHUmVk
           IEhhdDEQMA4GA1UECwwHQW5zaWJsZTEkMCIGA1UEAwwbQW5zaWJsZSBBdXRvbWF0
-          aW9uIFBsYXRmb3JtMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqNju
-          44XrKsBPTqv5J+OqRz3RsY1QIemHw3NIJF3d3UvimBHt42rHnwt4Lww3mYtYMJQ0
-          nzcRpr+EnFlC5YFl2Htrfq6NzUUqknTpaCeSKNCli4aKYe9JYSocWy/8ag+H7gMf
-          oUFJ7+PDh/S8HcP7ZA15RRXhyGdjzpUK9+ry/UcMcLE4ZOW2Z4YvFyjemh+c/yYY
-          KHsNjV56TRL5q4VqsxlKQuqNQos9lWoHjz363JxC9UrvTPqvl/UbHsQmTD8NKDnB
-          xxsaYTl41kVqscLSw5KR2c6CVVgSjIn5o0iAo01Sd4gONZ0ImhrzQ5Ea9Ya2kKG7
-          OCdg84V4hVmy/fnrcBC4k9RgNthWH9k4eMHwZf3B2P1xZds3dkV1k6yF3zSrQfJd
-          VJZ0AsaeGQGw26NQw0IG17P/jmho1jBhqSLaJyT9vVM/JMOjdojbD/dSFkccID1E
-          wUZeklYiLScD13rhckVk8MxrsFv99BO91tm07lwnj5jsyLoTvUOLuI4o7yw1AlsC
-          V/OjdpAohWbL0W6YxS/elBVgZhe7Gv2lnIF9L7TxTj/UQWaarouAIgyevqbP5dnt
-          mRccxZ38YGivRA+PgWwwSL9AQCFzIJW1Q45shUR2vkTsiWEEB+Lobkj5dcyLG0CH
-          Z7fnJnlKdNDcMbm2s6U1i+nHvv1dpfyveRvOiCsCAwEAAaNCMEAwDgYDVR0PAQH/
-          BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFHAFWQy/8in8Lg2TaG9g
-          NJyRxdMfMA0GCSqGSIb3DQEBCwUAA4ICAQBT5QI+nxhpEwPVp/BxZnxJWFBotHw3
-          rROgu1GBR3clZ+c+YFygAUs3LSpCLuDGnqJnh0822sIM+5FFP2ypqHdzeKo3TQEj
-          K4QiTBGeiSgqKqwHQdqPKywgFqAuxFC+clVrmFVR7dQJ8OiUZYNk5fwYLxnOftFQ
-          pxgpJyAX7vpZKnzujc5IGEqb3apjyxUuX3TFRq4uJp8ffWR9cgykeI8WFqAi33+K
-          RW8h9UQbS9mPjkJ3lbTtd06Jx2M0V2pwtQBMlp7aTboEqs+CB5moCIq1wTXvZBqB
-          dcqcpRGppYHL+QuUguBIlZcxn/8JpfoEsYVOJszp4YLEKzr68RoXvevObbrjJxfq
-          BnEPFKqt+pQpjEJktn8JDqp8G6gMc9n+Nkx88f3MR8yr2nhMl9YL6jSZLklH4JJV
-          2UjYg+KU/u/JttFmDydmys1xN9hiFM2wtRjp+r8gAQw95pyUhMraA01qLYWP5wAO
-          KsMpndKg6rUIycxNNr+eLGNafbUNsp9qayRSull5jKok43Goi8oF8edRlPY4qpZW
-          6WvY8+YjBLTCY1rQBb6/Rfr5PHSaRlGLi3Os6xG84gt69dLtMZBz4O232fc5sG5M
-          wMQ+MKwOpgDyuy79XKvsPanlAfP8WgJi79pJdHu3BGTLlDFil9CK8l2sncM1FdaE
-          57Ys1npOUx+oxw==
+          aW9uIFBsYXRmb3JtMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEApeIb
+          6Chw4kCGby02krwND3s5FyX5alaaoQ0UyrKqg7XCkUNfSxW+Q/2HKkt4GoswBSpc
+          eCCIzXZdHfcuIpAMgZqOTjPDBszOGznhji4KsN2uv/8ACV7ddCD012PgGhimiT7A
+          hznrUP977LV/4CwOc+NKes8uf2WrFSq11PI5upmsQQ3lFfAhK4ZWT4OMLTY0Kwg1
+          YgwquLaXg+60gcdAAiGRJcrc4stkYFn6mtSur5LF6Ni/6PAjCpRzkzzIL2LIR2Ha
+          4W1lMkHryzqswTQfMkPy24OtA23jBG+bT0s9cyyLQUGGqAL4XWCUikFHw70QUGOl
+          ans28lUS7ptTOiENTcaVEUYcnnAKjMadHsCIs1q9DQ3cGMhyZvf/SQhSYMUGxgM1
+          fRfNQ4YXchun681V3eJ4OkZwOedPAR/gFpmo80d+zG/SSa4PKhfwr7ZcSN8cT097
+          IIY6E4FOOiQrqM2MUxmZvQhVdkDBkcKNDE6Se/qZnN6TtQ+vpFjZEz41jmZ84Ntg
+          z86W3sTUczph1z9FyrweMNgiNOseJUQIHxxd3Vs7Or3BmIlmwiaHz781pabyv3Xo
+          yfBAHYllnmXXOWfC9HOC7tTL37FzzLx5xOElEZvMMuKa1AYSHMn8zfHeg9SSzX5R
+          eEsHw9ez2VLb8FeR0a7SAwZi8MAxG1M2hEAD8b8CAwEAAaNCMEAwDgYDVR0PAQH/
+          BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFPI7IBYU6oA9yPLyQ2/s
+          LUHsxbgjMA0GCSqGSIb3DQEBCwUAA4ICAQBkWvWQouV3dcBULh2EP/ZEJ6GvB5l8
+          ByeyYgPVy2OpFyV/MDKkk60lMxnBASNRwOk0wY1ABRKItnOjIHT6B9Og4Vr6vdRG
+          r9vOiayMiiGhWty8mM+XZ7ATznncjqqtpPlI7k6QGXAjmSlTfkZe3VyFwj38p4RY
+          HgCGne+mld3wcJ5uBV1QGS7VnqIe4dbN9M5KOloJGVfUeAn1oVq7TTQ49s4w8X1n
+          gtA/wZYmrQXt63/AvbkzXPqTwLhUPKH95tXo6SvqJ1coqjPI7bYN/aWnAnGbgy9j
+          TKxNYKHlCpmLlog3ucgKEgDoQpgl2NmGU5EFvs4R7mVKrAtQmBwihSYg6xlLDtiC
+          nGnuY1ZXCejKIZjDGmS1RySQOB81bDcI3weY0FoLQOU6Y+Tp/uR16MrE1JL75zaS
+          dzSAvNgZ8EJU08xtF9Pym91pOOHkVlXFkNnogUlBU3Lp4QWGPaqP+ubWnQmwr9O2
+          6au2oZWhBUmDwO5o2VhqlbPXsdL9mA/sXY4EvGuFynO30XDGqilSvjgzFcwaxJDx
+          84qKac3RhIWrQw1t4CD557ngPJpJAoH+T+UCADG3hw6ufV/MmingXXT2D+nh1U3S
+          zx74taEi67dEv3p+uBY13JIK0SI6iEQKcVjhWYwv1j/wgTibd9lJZYhfF6iqe8gs
+          UBMDh252dR3Mqg==
           -----END CERTIFICATE-----
       - name: control-report
         host: control-report
