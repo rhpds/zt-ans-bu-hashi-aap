@@ -1,36 +1,23 @@
 ---
-# Setup Module 03 - Runs automatically when module loads
-# Shows the GitHub manual steps attendees must complete before
-# clicking Next (validation)
+# setup.yml - Module 03
+# Auto-runs on module load
 
-- name: Show GitHub prerequisite steps
+- name: Show GitHub VCS info message
   ansible.builtin.copy:
     content: |
-      Module 3 - Before You Start
-      ============================
-      This module requires your personal GitHub account.
-      Please complete these steps BEFORE clicking Next:
+      [INFO]
+      GitHub VCS integration has been pre-configured for you in this lab.
 
-      1. Import this repo to your GitHub account:
-         https://github.com/ansible-tmm/aap-hashi-lab-2.git
+      In production you would normally:
+        1. Register an OAuth App in GitHub
+        2. Connect TFE to GitHub as a VCS provider
+        3. Create a VCS-backed workspace that auto-triggers on git push
 
-      2. In Terraform Enterprise, create a new workspace:
-         - Type: Version Control Workflow
-         - Name: TFE-Demo-VCS
-         - Connect to your imported GitHub repo
-
-      3. Configure workspace variables:
-         aap_host, aap_username, aap_password,
-         vault_addr, vault_role_id, vault_secret_id,
-         aws_access_key, aws_secret_key
-
-      4. Disable SSL on the GitHub webhook
-
-      5. Commit a change to TF_templates/AWS/terraform.tfvars
-         (change instance_count = 0 to instance_count = 2)
-         to trigger the run
-
-      Once TFE runs and AAP workflow completes, click Next.
-    dest: "{{ job_info_dir }}/script.out"
+      Click Next to continue to Module 4.
+    dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
   when: job_info_dir is defined
+
+- name: Show message
+  ansible.builtin.fail:
+    msg: "GitHub VCS pre-configured - click Next to continue"
