@@ -128,15 +128,15 @@ su - rhel -c "aws ec2 create-default-vpc --region $AWS_DEFAULT_REGION"
 #
 #Create the S3 bucket for the users of this AAP / Terraform lab
 # Variables
-BUCKET_PREFIX="aap-tf-bucket"  # Change this to your desired bucket prefix
-RANDOM_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')  # Generate a random UUID and convert to lowercase
-BUCKET_NAME="${BUCKET_PREFIX}-${RANDOM_ID}"
-AWS_REGION="$AWS_DEFAULT_REGION"  # Change this to your desired AWS region
+# BUCKET_PREFIX="aap-tf-bucket"  # Change this to your desired bucket prefix
+# RANDOM_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')  # Generate a random UUID and convert to lowercase
+# BUCKET_NAME="${BUCKET_PREFIX}-${RANDOM_ID}"
+# AWS_REGION="$AWS_DEFAULT_REGION"  # Change this to your desired AWS region
 #
 #
 # Create the S3 STORAGE BUCKET NEEDED BY THE AAP 2.X CHALLENGE
-echo "Creating S3 bucket: $BUCKET_NAME in region $AWS_DEFAULT_REGION"
-su - rhel -c "aws s3api create-bucket --bucket $BUCKET_NAME --region $AWS_DEFAULT_REGION"
+# echo "Creating S3 bucket: $BUCKET_NAME in region $AWS_DEFAULT_REGION"
+# su - rhel -c "aws s3api create-bucket --bucket $BUCKET_NAME --region $AWS_DEFAULT_REGION"
 #
 ########
 ## install python3 libraries needed for the Cloud Report

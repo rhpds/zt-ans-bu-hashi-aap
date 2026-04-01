@@ -1,9 +1,9 @@
 ---
-# Validate Module 03 - TFE VCS Workspace + Trigger
+# Validate Module 03 - Only gate on AAP workflow existing
 
 - name: Set TFE token
   ansible.builtin.set_fact:
-    tfe_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('') }}"
+    tfe_token: "{{ tfe_api_token | default(lookup('env', 'TFE_API_TOKEN')) | default('') }}"
 
 - name: Check TFE workspace TFE-Demo-VCS exists
   ansible.builtin.uri:
@@ -15,20 +15,6 @@
     status_code: [200, 404]
   register: r_vcs_workspace
   when: tfe_token | length > 0
-  ignore_errors: true
-
-- name: Check TFE workspace has at least one run
-  ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/workspaces/{{ r_vcs_workspace.json.data.id }}/runs?page[size]=1"
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
-    validate_certs: false
-  register: r_tfe_runs
-  when:
-    - tfe_token | length > 0
-    - r_vcs_workspace is defined
-    - r_vcs_workspace.status | default(404) == 200
   ignore_errors: true
 
 - name: Check workflow 'WF-Launched by TFE' exists
@@ -43,7 +29,6 @@
 - name: Set check facts
   ansible.builtin.set_fact:
     vcs_workspace_exists: "{{ r_vcs_workspace.status | default(404) == 200 }}"
-    tfe_has_runs: "{{ (r_tfe_runs.json.data | default([]) | length) > 0 }}"
     wf_exists: "{{ r_wf_tfe.json.count > 0 }}"
   ignore_errors: true
 
@@ -52,16 +37,13 @@
     validation_output: |
       Module 3 Validation Results
       ============================
-      TFE:
-      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created
-      {{ '[OK]' if tfe_has_runs | default(false) | bool else '[X] ' }} TFE workspace triggered (at least one run)
+      TFE (optional - requires GitHub account):
+      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created with VCS
 
       AAP:
       {{ '[OK]' if wf_exists | default(false) | bool else '[X] ' }} Workflow 'WF-Launched by TFE' exists
     validation_passed: >-
-      {{ (vcs_workspace_exists | default(false) | bool)
-         and (tfe_has_runs | default(false) | bool)
-         and (wf_exists | default(false) | bool) }}
+      {{ wf_exists | default(false) | bool }}
   ignore_errors: true
 
 - name: Write failure output to validation_failure.out
@@ -75,5 +57,5 @@
 
 - name: Fail if validation did not pass
   ansible.builtin.fail:
-    msg: "One or more checks failed. Complete the missing tasks and try again."
+    msg: "Complete the missing tasks and try again."
   when: not validation_passed | default(false) | bool

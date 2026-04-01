@@ -52,9 +52,41 @@
               id: "{{ tfe_project_id }}"
     validate_certs: false
     status_code: [200, 201]
+  register: r_ws_create
   when:
     - tfe_api_token | default('') | length > 0
     - r_ws_check.status == 404
+
+- name: Add workspace environment variables
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/workspaces/{{ r_ws_create.json.data.id }}/vars"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    body_format: json
+    body:
+      data:
+        type: vars
+        attributes:
+          key: "{{ item.key }}"
+          value: "{{ item.value }}"
+          category: env
+          hcl: false
+          sensitive: "{{ item.sensitive | default(false) }}"
+    validate_certs: false
+    status_code: [200, 201]
+  loop:
+    - key: AWS_ACCESS_KEY_ID
+      value: "{{ aws_access_key }}"
+      sensitive: false
+    - key: AWS_SECRET_ACCESS_KEY
+      value: "{{ aws_secret_key }}"
+      sensitive: true
+  when:
+    - r_ws_create is defined
+    - r_ws_create is not skipped
+    - r_ws_create.status in [200, 201]
 
 # Step 2: Get prerequisite IDs from AAP
 - name: Get Default org ID
@@ -245,7 +277,7 @@
       execution_environment: "{{ ee_id | int }}"
       overwrite: true
       update_on_launch: true
-      source_vars: "hostnames:\n  - tag:Name\ncompose:\n  ansible_host: public_ip_address\n  ansible_ssh_pipelining: 'true'"
+      source_vars: "hostnames:\n  - tag:Name\ncompose:\n  ansible_host: public_ip_address\n  ansible_ssh_pipelining: 'true'\nregions:\n  - us-east-2"
     status_code: [200, 201]
   register: r_inv_source_create
   when: r_inv_source_check.json.count == 0
@@ -281,6 +313,13 @@
       project: "{{ project_id | int }}"
       playbook: "playbooks/terraform_apply_plan.yml"
       execution_environment: "{{ ee_id | int }}"
+      extra_vars: |
+        ---
+        aws_region: us-east-2
+        aws_name_tag: tfevm
+        aws_instance_size: t2.micro
+        aws_instance_count: 1
+        aws_instance_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAKzl1JGwZh92P1ABxIVHE52I2nJk+h7ED4B6GgbMXAl hmourad@hmourad-mac"
     status_code: [200, 201]
   register: r_jt_apply_create
   when: r_jt_apply_check.json.count == 0

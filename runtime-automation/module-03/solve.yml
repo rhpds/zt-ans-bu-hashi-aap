@@ -1,177 +1,198 @@
 ---
-# Solve Module 03 - TFE VCS Workspace + Variables + Trigger
-# Note: GitHub OAuth connection cannot be automated.
-# This solve creates TFE-Demo-VCS workspace and required variables,
-# then triggers a plan-only run so the user can move forward.
-
-- name: Set TFE API token
-  ansible.builtin.set_fact:
-    tfe_token: "{{ lookup('env', 'TFE_API_TOKEN') | default('') }}"
-    guid: "{{ lookup('env', 'GUID') }}"
-    domain: "{{ lookup('env', 'DOMAIN') }}"
+# Solve Module 03 - Two-step approach
+# Step 1: Run Solve to set up AAP + see GitHub steps
+# Step 2: Do GitHub steps manually, then run Solve again to confirm
 
 # -------------------------------------------------------------------
-# Step 1: Get TFE project ID
+# Always ensure WF-Launched by TFE exists in AAP (idempotent)
 # -------------------------------------------------------------------
 
-- name: Get TFE projects
+- name: Get Default org ID
   ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/projects"
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
+    url: "{{ aap_host }}/api/controller/v2/organizations/?name=Default"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
     validate_certs: false
-  register: r_projects
+  register: r_org
 
-- name: Set project ID
+- name: Check if WF-Launched by TFE exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Launched+by+TFE"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_check
+
+- name: Create WF-Launched by TFE workflow
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      name: "WF-Launched by TFE"
+      organization: "{{ r_org.json.results[0].id | int }}"
+      ask_inventory_on_launch: true
+    status_code: [200, 201]
+  register: r_wf_create
+  when: r_wf_check.json.count == 0
+
+- name: Set workflow ID
   ansible.builtin.set_fact:
-    tfe_project_id: "{{ r_projects.json.data | selectattr('attributes.name', 'equalto', 'rhdp-initial-project') | map(attribute='id') | first }}"
+    wf_id: "{{ (r_wf_create.json.id if r_wf_check.json.count == 0 else r_wf_check.json.results[0].id) | int }}"
+
+- name: Get inventory source ID for workflow nodes
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_inv_source
+
+- name: Get TFE-VCS job template ID for workflow nodes
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Install+Nginx+on+RHEL+-+TFE-VCS"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_vcs
+
+- name: Add inventory sync node to workflow
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      workflow_job_template: "{{ wf_id | int }}"
+      unified_job_template: "{{ r_inv_source.json.results[0].id | int }}"
+    status_code: [200, 201]
+  register: r_node1
+  when:
+    - r_wf_check.json.count == 0
+    - r_inv_source.json.count > 0
+
+- name: Add Install Nginx TFE-VCS node to workflow
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body:
+      workflow_job_template: "{{ wf_id | int }}"
+      unified_job_template: "{{ r_jt_vcs.json.results[0].id | int }}"
+    status_code: [200, 201]
+  register: r_node2
+  when:
+    - r_wf_check.json.count == 0
+    - r_jt_vcs.json.count > 0
+
+- name: Link inventory sync -> nginx install
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_template_nodes/{{ r_node1.json.id | int }}/success_nodes/"
+    method: POST
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    body_format: json
+    body: "{{ {'id': r_node2.json.id | int} }}"
+    status_code: [200, 204]
+  when:
+    - r_wf_check.json.count == 0
+    - r_node1 is defined
+    - r_node2 is defined
 
 # -------------------------------------------------------------------
-# Step 2: Create TFE-Demo-VCS workspace (API-based, no VCS needed)
+# Check if GitHub steps have been completed (TFE-Demo-VCS exists)
 # -------------------------------------------------------------------
 
-- name: Check if TFE-Demo-VCS workspace exists
+- name: Check if TFE-Demo-VCS workspace already exists
   ansible.builtin.uri:
     url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces/TFE-Demo-VCS"
     headers:
-      Authorization: "Bearer {{ tfe_token }}"
+      Authorization: "Bearer {{ tfe_api_token | default('') }}"
       Content-Type: "application/vnd.api+json"
     validate_certs: false
     status_code: [200, 404]
-  register: r_ws_check
-
-- name: Create TFE-Demo-VCS workspace
-  ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
-    body_format: json
-    body:
-      data:
-        type: workspaces
-        attributes:
-          name: "TFE-Demo-VCS"
-          description: "Using GitHub commits to trigger Plan/Apply Runs"
-          execution-mode: remote
-          auto-apply: true
-        relationships:
-          project:
-            data:
-              type: projects
-              id: "{{ tfe_project_id }}"
-    validate_certs: false
-    status_code: [200, 201]
-  register: r_ws_create
-  when: r_ws_check.status == 404
-
-- name: Set workspace ID
-  ansible.builtin.set_fact:
-    vcs_workspace_id: "{{ r_ws_create.json.data.id | default(r_ws_check.json.data.id) }}"
-
-# -------------------------------------------------------------------
-# Step 3: Add required Terraform variables to TFE-Demo-VCS
-# -------------------------------------------------------------------
-
-- name: Get existing workspace variables
-  ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/workspaces/{{ vcs_workspace_id }}/vars"
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
-    validate_certs: false
-  register: r_existing_vars
-
-- name: Set existing variable keys
-  ansible.builtin.set_fact:
-    existing_var_keys: "{{ r_existing_vars.json.data | map(attribute='attributes.key') | list }}"
-
-- name: Add TFE workspace variables
-  ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/workspaces/{{ vcs_workspace_id }}/vars"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
-    body_format: json
-    body:
-      data:
-        type: vars
-        attributes:
-          key: "{{ item.key }}"
-          value: "{{ item.value }}"
-          category: terraform
-          sensitive: "{{ item.sensitive | default(false) }}"
-    validate_certs: false
-    status_code: [200, 201]
-  when: item.key not in existing_var_keys
-  loop:
-    - key: aap_host
-      value: "https://control-{{ guid }}.{{ domain }}"
-      sensitive: false
-    - key: aap_username
-      value: admin
-      sensitive: false
-    - key: aap_password
-      value: "ansible123!"
-      sensitive: true
-    - key: vault_addr
-      value: "https://vault-{{ guid }}.{{ domain }}"
-      sensitive: false
-    - key: aws_access_key
-      value: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('REPLACE_ME') }}"
-      sensitive: false
-    - key: aws_secret_key
-      value: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('REPLACE_ME') }}"
-      sensitive: true
-
-# -------------------------------------------------------------------
-# Step 4: Queue a plan-only run to show workspace is working
-# -------------------------------------------------------------------
-
-- name: Queue a plan-only run in TFE-Demo-VCS
-  ansible.builtin.uri:
-    url: "{{ tfe_host }}/api/v2/runs"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ tfe_token }}"
-      Content-Type: "application/vnd.api+json"
-    body_format: json
-    body:
-      data:
-        type: runs
-        attributes:
-          message: "Solve run - plan only"
-          plan-only: true
-        relationships:
-          workspace:
-            data:
-              type: workspaces
-              id: "{{ vcs_workspace_id }}"
-    validate_certs: false
-    status_code: [200, 201]
-  register: r_run
+  register: r_vcs_workspace
+  when: tfe_api_token | default('') | length > 0
   ignore_errors: true
 
+- name: Set workspace status fact
+  ansible.builtin.set_fact:
+    vcs_workspace_done: "{{ r_vcs_workspace.status | default(404) == 200 }}"
+
 # -------------------------------------------------------------------
-# Write output
+# Step 2: GitHub steps done — workspace exists, show completion
 # -------------------------------------------------------------------
 
-- name: Write solve output to script.out
+- name: Show completion message (GitHub steps done)
   ansible.builtin.copy:
     content: |
-      Module 3 Solved
-      ===============
-      \u2714 TFE workspace 'TFE-Demo-VCS' created
-      \u2714 Terraform variables configured (aap_host, aap_username, vault_addr, aws keys)
-      \u2714 Plan-only run queued in TFE
+      [INFO]
+      [OK] WF-Launched by TFE is configured in AAP
+      [OK] TFE-Demo-VCS workspace detected
 
-      Note: GitHub VCS connection requires manual setup.
-      To complete the full scenario, connect the workspace to your
-      GitHub fork of ansible-tmm/aap-hashi-lab-2 and commit changes
-      to trigger provisioning.
-    dest: "{{ job_info_dir }}/script.out"
+      AAP and TFE setup is complete!
+      Click Next to validate module 3.
+    dest: "{{ job_info_dir }}/validation_failure.out"
   delegate_to: localhost
-  when: job_info_dir is defined
+  when:
+    - job_info_dir is defined
+    - vcs_workspace_done | bool
+
+- name: Succeed when workspace exists
+  ansible.builtin.debug:
+    msg: "Module 3 setup complete — workspace exists and AAP is configured."
+  when: vcs_workspace_done | bool
+
+# -------------------------------------------------------------------
+# Step 1: GitHub steps not done yet — show instructions and stop
+# -------------------------------------------------------------------
+
+- name: Show GitHub steps (first solve run)
+  ansible.builtin.copy:
+    content: |
+      [INFO]
+      [OK] WF-Launched by TFE is configured in AAP
+
+      Now complete these GitHub steps, then run Solve again:
+
+      1. Import to your GitHub: https://github.com/ansible-tmm/aap-hashi-lab-2.git
+
+      2. In TFE: New workspace > Version Control Workflow
+         Connect to your imported GitHub repo
+         Workspace name: TFE-Demo-VCS
+
+      3. Add workspace variables:
+         aap_host, aap_username, aap_password
+         vault_addr, vault_role_id, vault_secret_id
+         aws_access_key, aws_secret_key, aws_region (us-east-2)
+
+      4. Disable SSL on the GitHub webhook
+
+      5. Run Solve again to confirm setup is complete.
+    dest: "{{ job_info_dir }}/validation_failure.out"
+  delegate_to: localhost
+  when:
+    - job_info_dir is defined
+    - not vcs_workspace_done | bool
+
+- name: Prompt to complete GitHub steps
+  ansible.builtin.fail:
+    msg: "Complete the GitHub steps shown above, then run Solve again."
+  when: not vcs_workspace_done | bool
