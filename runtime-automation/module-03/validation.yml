@@ -1,5 +1,5 @@
 ---
-# Validate Module 03 - Only gate on AAP workflow existing
+# Validate Module 03 - TFE VCS Workspace + Trigger
 
 - name: Set TFE token
   ansible.builtin.set_fact:
@@ -52,14 +52,16 @@
     validation_output: |
       Module 3 Validation Results
       ============================
-      TFE (optional - requires GitHub account):
-      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created with VCS
+      TFE:
+      {{ '[OK]' if vcs_workspace_exists | default(false) | bool else '[X] ' }} Workspace 'TFE-Demo-VCS' created
       {{ '[OK]' if tfe_has_runs | default(false) | bool else '[X] ' }} TFE workspace triggered (at least one run)
 
       AAP:
       {{ '[OK]' if wf_exists | default(false) | bool else '[X] ' }} Workflow 'WF-Launched by TFE' exists
     validation_passed: >-
-      {{ wf_exists | default(false) | bool }}
+      {{ (vcs_workspace_exists | default(false) | bool)
+         and (tfe_has_runs | default(false) | bool)
+         and (wf_exists | default(false) | bool) }}
   ignore_errors: true
 
 - name: Write failure output to validation_failure.out
