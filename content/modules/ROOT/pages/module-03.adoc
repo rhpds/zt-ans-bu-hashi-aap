@@ -12,6 +12,12 @@ Let's work through to completion of this scenario.
 
 NOTE:  You MUST have a github account to complete this lab. Having said that if you want to use a GitLAB account, you can do so by creating a new GitLAB account and using that instead of a GitHub account. The instructions will be nearly identical. The only difference are the values from TFE did not auto fill in gitlab when creating the OAuth application, so you have to copy and paste those values manually.
 
+[NOTE]
+====
+The GitHub OAuth connection to Terraform Enterprise has been pre-configured for you in this lab.
+If you do not have a GitHub account, you can skip Tasks 1 and 2 and proceed directly to xref:module-03.adoc#task3[Task 3].
+====
+
 * Terraform Enterprise
 ** Import a GitHub repository to your account
 ** Create a Terraform Enterprise Workspace that uses Version Control System (VCS, in this case GitHub) to store the Terraform code
