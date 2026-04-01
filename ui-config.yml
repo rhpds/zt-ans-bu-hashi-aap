@@ -19,6 +19,7 @@ antora:
       label: "Trigger Infrastructure Provisioning and automation from Terraform Enterprise - Part 2"
       solveButton: true
       scripts:
+        - setup
         - solve
         - validation
     - name: module-04
