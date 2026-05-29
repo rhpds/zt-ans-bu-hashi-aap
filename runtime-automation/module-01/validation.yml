@@ -1,0 +1,119 @@
+---
+# Validate Module 01 - AAP + Terraform Enterprise
+
+- name: Check TFE credential type exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credential_types/?name=Terraform+Enterprise+credential+type"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_cred_type
+
+- name: Check TFE credential exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/credentials/?name=Terraform+Enterprise+credential"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_credential
+
+- name: Check inventory source exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/inventory_sources/?name=AWS+source+for+TFE+resources"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_inv_source
+
+- name: Check APPLY job template exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+APPLY"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_apply
+
+- name: Check DESTROY job template exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/job_templates/?name=Terraform+Enterprise+DESTROY"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_jt_destroy
+
+- name: Check WF-APPLY workflow exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+APPLY"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_apply
+
+- name: Check WF-DESTROY workflow exists
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/controller/v2/workflow_job_templates/?name=WF-Terraform+Enterprise+DESTROY"
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: r_wf_destroy
+
+- name: Check TFE workspace exists
+  ansible.builtin.uri:
+    url: "{{ tfe_host }}/api/v2/organizations/{{ tfe_org }}/workspaces/{{ tfe_workspace_name }}"
+    headers:
+      Authorization: "Bearer {{ tfe_api_token }}"
+      Content-Type: "application/vnd.api+json"
+    validate_certs: false
+    status_code: [200, 404]
+  register: r_tfe_workspace
+  when: tfe_api_token | default('') | length > 0
+  ignore_errors: true
+
+# Pre-compute as boolean to avoid .status access failure on skipped task
+- name: Set TFE workspace fact
+  ansible.builtin.set_fact:
+    tfe_workspace_ok: "{{ r_tfe_workspace.status | default(404) == 200 }}"
+
+- name: Build validation results
+  ansible.builtin.set_fact:
+    validation_output: |
+      Module 1 Validation Results
+      ============================
+      {{ '[OK]' if r_cred_type.json.count > 0 else '[X] ' }} TFE credential type
+      {{ '[OK]' if r_credential.json.count > 0 else '[X] ' }} TFE credential
+      {{ '[OK]' if r_inv_source.json.count > 0 else '[X] ' }} Inventory source (AWS source for TFE resources)
+      {{ '[OK]' if r_jt_apply.json.count > 0 else '[X] ' }} Job template: Terraform Enterprise APPLY
+      {{ '[OK]' if r_jt_destroy.json.count > 0 else '[X] ' }} Job template: Terraform Enterprise DESTROY
+      {{ '[OK]' if r_wf_apply.json.count > 0 else '[X] ' }} Workflow: WF-Terraform Enterprise APPLY
+      {{ '[OK]' if r_wf_destroy.json.count > 0 else '[X] ' }} Workflow: WF-Terraform Enterprise DESTROY
+      {{ '[OK]' if tfe_workspace_ok | bool else '[X] ' }} TFE workspace: {{ tfe_workspace_name }}
+    validation_passed: >-
+      {{ r_cred_type.json.count > 0
+         and r_credential.json.count > 0
+         and r_inv_source.json.count > 0
+         and r_jt_apply.json.count > 0
+         and r_jt_destroy.json.count > 0
+         and r_wf_apply.json.count > 0
+         and r_wf_destroy.json.count > 0 }}
+
+- name: Write failure details to validation_failure.out
+  ansible.builtin.copy:
+    content: "{{ validation_output }}"
+    dest: "{{ job_info_dir }}/validation_failure.out"
+  delegate_to: localhost
+  when:
+    - job_info_dir is defined
+    - not validation_passed | bool
+    - not validation_passed | bool
+
+- name: Fail if validation did not pass
+  ansible.builtin.fail:
+    msg: "One or more checks failed. Complete the missing tasks and try again."
+  when: not validation_passed | bool

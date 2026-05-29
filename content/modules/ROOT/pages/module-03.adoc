@@ -12,6 +12,12 @@ Let's work through to completion of this scenario.
 
 NOTE:  You MUST have a github account to complete this lab. Having said that if you want to use a GitLAB account, you can do so by creating a new GitLAB account and using that instead of a GitHub account. The instructions will be nearly identical. The only difference are the values from TFE did not auto fill in gitlab when creating the OAuth application, so you have to copy and paste those values manually.
 
+[NOTE]
+====
+The GitHub OAuth connection to Terraform Enterprise has been pre-configured for you in this lab.
+If you do not have a GitHub account, you can skip Tasks 1 and 2 and proceed directly to xref:module-03.adoc#task3[Task 3].
+====
+
 * Terraform Enterprise
 ** Import a GitHub repository to your account
 ** Create a Terraform Enterprise Workspace that uses Version Control System (VCS, in this case GitHub) to store the Terraform code
@@ -150,6 +156,24 @@ image::workspace10.png[link=self, window=blank, width=100%]
 
 * On the next screen, add the following `Terraform variables`:
 
+[NOTE]
+====
+**Where to find your values:**
+
+* **AWS Access Key / Secret Key** — Click the `Cloud (AWS)` tab at the top of this lab. Your AWS credentials are displayed there.
+
+* **vault_role_id / vault_secret_id** — These were generated in Module 2 when you created the AppRole. If you need to retrieve them again, open the `Terminal` tab and run:
++
+[source,bash,role=execute]
+----
+ssh rhel@vault
+export VAULT_ADDR=http://127.0.0.1:8200
+vault login -address=http://127.0.0.1:8200 -method=userpass username=admin password=ansible123!
+vault read auth/approle/role/aapterraform/role-id
+vault write -f auth/approle/role/aapterraform/secret-id
+----
+====
+
 |===
 | Key | Value | Sensitive
 
@@ -167,12 +191,16 @@ image::workspace10.png[link=self, window=blank, width=100%]
 | Yes
 
 | aws_access_key
-| <your aws access key id>
+| **From the `Cloud (AWS)` tab in your lab**
 | No
 
 | aws_secret_key
-| <your aws secret access key>
+| **From the `Cloud (AWS)` tab in your lab**
 | Yes
+
+| aws_region
+| us-east-2
+| No
 
 | vault_addr
 | https://vault-{guid}.{domain} +
@@ -180,11 +208,11 @@ image::workspace10.png[link=self, window=blank, width=100%]
 | No
 
 | vault_role_id
-| <your vault role id>
+| **From the Terminal — see note above**
 | No
 
 | vault_secret_id
-| <your vault secret id>
+| **From the Terminal — see note above**
 | Yes
 |===
 
