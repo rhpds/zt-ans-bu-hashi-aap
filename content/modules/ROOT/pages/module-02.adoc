@@ -4,7 +4,7 @@
 
 In this challenge you will learn how to trigger infrastructure provisioning and automation from Terraform Enterprise.
 
-The follwoing diagram shows the overall scenario that we will be covering in this, and the following lab sections. Let's work through to completion of this scenario.
+The following diagram shows the overall scenario that we will be covering in this, and the following lab sections. Let's work through to completion of this scenario.
 
 image::module2-3scenario.png[link=self, window=blank, width=100%]
 
